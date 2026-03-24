@@ -3,120 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    
-    <!-- Web App Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Citation Flashcards">
-
+    <meta name="apple-mobile-web-app-title" content="Citation Fluency">
     <title>Citation Fluency Builder — The Conscious Architect</title>
-    
-    <!-- Scripts -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Styles -->
     <style>
-        .perspective-1000 {
-            perspective: 1000px;
-            -webkit-perspective: 1000px;
-        }
-        .transform-style-preserve-3d {
-            transform-style: preserve-3d;
-            -webkit-transform-style: preserve-3d;
-        }
-        .backface-hidden {
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-        }
-        .rotate-y-180 {
-            transform: rotateY(180deg);
-            -webkit-transform: rotateY(180deg);
-        }
-        .card-flip-container {
-            will-change: transform;
-        }
+        .perspective-1000 { perspective: 1000px; -webkit-perspective: 1000px; }
+        .transform-style-preserve-3d { transform-style: preserve-3d; -webkit-transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+        .card-flip-container { will-change: transform; }
+        .rotate-y-180 { transform: rotateY(180deg); -webkit-transform: rotateY(180deg); }
         * { -webkit-tap-highlight-color: transparent; }
         .touch-action-pan-y { touch-action: pan-y; }
         .dark-transition { transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
         .btn-bounce:hover { transform: scale(1.05); }
         .btn-bounce:active { transform: scale(0.95); }
         .btn-bounce { transition: transform 0.15s ease; }
-        .card-shadow {
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-        }
+        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); }
         .circular-progress { transform: rotate(-90deg); }
         .circular-progress circle { transition: stroke-dashoffset 0.5s ease; }
-        @keyframes slideIn {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        @keyframes slideOut {
-            from { transform: translateY(0); opacity: 1; }
-            to { transform: translateY(100%); opacity: 0; }
-        }
+        @keyframes slideIn { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .toast-enter { animation: slideIn 0.3s ease forwards; }
-        .toast-exit { animation: slideOut 0.3s ease forwards; }
-        @keyframes flicker {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
+        @keyframes flicker { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         .streak-fire { animation: flicker 1s ease-in-out infinite; }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
         .badge-pulse { animation: pulse 2s ease-in-out infinite; }
-
-        /* Score dots */
-        .score-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-        
-        /* Scrollable back of card */
-        .card-back-content {
-            overflow-y: auto;
-            max-height: 340px;
-            scrollbar-width: thin;
-        }
-        .card-back-content::-webkit-scrollbar {
-            width: 4px;
-        }
-        .card-back-content::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.3);
-            border-radius: 2px;
-        }
-
-        /* Category pill scrolling */
-        .category-pills {
-            overflow-x: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        .category-pills::-webkit-scrollbar {
-            display: none;
-        }
+        .score-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+        .card-back-content { overflow-y: auto; max-height: 360px; scrollbar-width: thin; }
+        .card-back-content::-webkit-scrollbar { width: 4px; }
+        .card-back-content::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.4); border-radius: 2px; }
+        .category-pills { overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        .category-pills::-webkit-scrollbar { display: none; }
+        .show-more-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+        .show-more-content.expanded { max-height: 2000px; }
     </style>
 </head>
 <body class="overscroll-none">
     <div id="root"></div>
-
     <script type="text/babel">
         const { useState, useEffect, useMemo, useCallback, useRef } = React;
-
-        // --- Inline Data ---
-        const CITATION_DATA = {
+        const DATA = 
+{
   "metadata": {
     "title": "The Conscious Architect — Citation Fluency Builder",
     "author": "Travis Knudsen",
     "totalSources": 153,
     "topTierCount": 36,
-    "generated": "2026-03-23"
+    "generated": "2026-03-23",
+    "connectionCardCount": 30,
+    "features": [
+      "three-tier cards",
+      "one-liners",
+      "connection cards",
+      "argument chains"
+    ]
   },
   "categories": {
     "Philosophical Foundations": [
@@ -304,7 +248,8 @@
       "departs": "You follow Whitehead's metaphysics faithfully and extend it. Where you go further is in making consciousness explicitly fundamental rather than experiential. Whitehead's system includes 'prehension' (a kind of proto-experience in all events), but he never made the strong claim you make — that universal consciousness is the ground of being and brains are prisms refracting it. Whitehead scholars would likely say you have taken his framework and loaded it with more ontological weight on consciousness than he intended.",
       "objection": "Whitehead is notoriously difficult to read, and his system is internally complex in ways that resist summary. Sophie would ask: 'Have you actually worked through Process and Reality, or are you using the accessible version of his ideas?' She would also note that many professional philosophers consider process philosophy a minority position, and that Whitehead's 'actual occasions' framework has not been widely adopted in mainstream analytic philosophy of mind.",
       "keyDetails": "Whitehead coined 'actual occasions' — each moment is an event that gathers data from the past, creates a novel synthesis, and perishes into the next. His 'concrescence' means the many becoming one. 'The fallacy of misplaced concreteness' is his term for mistaking abstractions (like 'matter') for the fundamental reality. He collaborated with Russell on Principia Mathematica (1910-1913) before turning to metaphysics in his sixties. Process and Reality is dedicated to exploring how experience is woven into the fabric of reality.",
-      "suggestedReading": "Process and Reality, Part I (especially Chapter 1 'Speculative Philosophy' and Chapter 2 'The Categoreal Scheme'), approximately 50 pages. For a more accessible entry: Donald Sherburne's A Key to Whitehead's Process and Reality (1966), which reorganizes Whitehead's text thematically."
+      "suggestedReading": "Process and Reality, Part I (especially Chapter 1 'Speculative Philosophy' and Chapter 2 'The Categoreal Scheme'), approximately 50 pages. For a more accessible entry: Donald Sherburne's A Key to Whitehead's Process and Reality (1966), which reorganizes Whitehead's text thematically.",
+      "oneLiner": "Whitehead basically handed us the blueprint. Reality is made of events, moments of becoming, not dead stuff sitting around."
     },
     {
       "rank": 2,
@@ -322,7 +267,8 @@
       "departs": "Chalmers names the problem but does not endorse your solution. He is sympathetic to panpsychism and has explored it, but he has not endorsed Process Idealism or any specific consciousness-first framework. You take his problem and offer a specific answer — that consciousness is fundamental and brains are prisms — that Chalmers himself has not committed to. He would likely say your answer is one possible response among several.",
       "objection": "Sophie would note that Dennett and other eliminativists argue the Hard Problem is a pseudo-problem — that once you fully explain the functional and behavioral aspects, there is nothing left to explain. She would also note that Chalmers's own position has evolved since 1995 and that he has been careful not to commit to the kind of strong idealism you propose. The Hard Problem remains genuinely contested in philosophy of mind.",
       "keyDetails": "The 1995 paper is only 19 pages. The key distinction: 'easy problems' (information processing, behavioral control, reportability) vs. the 'hard problem' (why subjective experience exists at all). Chalmers uses the thought experiment of philosophical zombies — beings functionally identical to humans but with no inner experience — to show the Hard Problem cannot be solved by functional explanation alone. His 2010 book The Character of Consciousness updates the argument.",
-      "suggestedReading": "The original 1995 paper — it is only 19 pages, clearly written, and the single most important document in the field. Available free online through Chalmers's website at consc.net."
+      "suggestedReading": "The original 1995 paper — it is only 19 pages, clearly written, and the single most important document in the field. Available free online through Chalmers's website at consc.net.",
+      "oneLiner": "Chalmers names the thing that keeps physicalists up at night, the reason the book even exists in the first place."
     },
     {
       "rank": 3,
@@ -340,7 +286,8 @@
       "departs": "You adopt Goff's panpsychism but reject his approach to the Combination Problem. Your ceramic pot thought experiment is designed to show that the question 'how do small conscious things combine?' dissolves when you reframe it as 'how does a single field give rise to many perspectives?' Goff would likely push back on this move — the Combination Problem is genuinely difficult and your dissolution of it is one of your most ambitious philosophical claims.",
       "objection": "Sophie would note that panpsychism remains a minority position in philosophy of mind and that it faces the serious Combination Problem Goff himself acknowledges. She might also note that many scientists find panpsychism unfalsifiable — there is no experiment that could prove or disprove that electrons have experience. The charge of unfalsifiability is the most common scientific objection.",
       "keyDetails": "The title refers to Galileo's 1623 Il Saggiatore, where he argued only primary qualities (mass, shape, motion) are real; secondary qualities (color, taste, smell) exist only in the mind. Goff argues this move created 400 years of confusion. The Combination Problem: if electrons have proto-consciousness, how does that combine into your unified experience? Goff's answer involves 'microphenomenal' qualities. Your answer is that the question itself is wrong — consciousness is a field, not particles.",
-      "suggestedReading": "Chapters 1-4 and Chapter 7 of Galileo's Error (roughly 120 pages). Chapters 1-4 lay out the argument against materialism and for panpsychism. Chapter 7 addresses the Combination Problem — the exact point where you depart from Goff."
+      "suggestedReading": "Chapters 1-4 and Chapter 7 of Galileo's Error (roughly 120 pages). Chapters 1-4 lay out the argument against materialism and for panpsychism. Chapter 7 addresses the Combination Problem — the exact point where you depart from Goff.",
+      "oneLiner": "Goff cracked open panpsychism, but he runs into the Combination Problem and that's where Travis had to chart his own course."
     },
     {
       "rank": 4,
@@ -358,7 +305,8 @@
       "departs": "You follow Kastrup closely but add the process dimension from Whitehead. Kastrup's idealism is more static — consciousness dissociates. Your Process Idealism emphasizes that consciousness is always in motion, always becoming. The whirlpool is not just a dissociated segment; it is a dynamic pattern that constantly re-creates itself through interaction with the field. Kastrup might accept this extension, but it is distinctively yours.",
       "objection": "Sophie would note that Kastrup's DID analogy is doing heavy philosophical lifting and may not hold under scrutiny. DID involves a single brain; universal consciousness has no single brain. The analogy between clinical dissociation and metaphysical plurality is suggestive but not proven. She would also note that Kastrup has vocal critics in academic philosophy who consider his arguments more rhetorical than rigorous.",
       "keyDetails": "Kastrup holds a PhD in computer engineering from CERN and a PhD in philosophy. His key argument: all we ever experience directly is consciousness. The physical world is an inference. Therefore, the most parsimonious ontology is that consciousness is fundamental and 'the physical' is how consciousness appears when observed from the outside. The DID analogy: just as one mind can contain multiple centers of experience, universal consciousness contains all individual minds as dissociated alters.",
-      "suggestedReading": "Chapters 1-3 and Chapter 8 of The Idea of the World (roughly 80 pages). Chapter 1 lays the ontological argument. Chapters 2-3 address the combination problem through the DID model. Chapter 8 synthesizes. His shorter book Why Materialism Is Baloney (2014) is a more accessible entry point."
+      "suggestedReading": "Chapters 1-3 and Chapter 8 of The Idea of the World (roughly 80 pages). Chapter 1 lays the ontological argument. Chapters 2-3 address the combination problem through the DID model. Chapter 8 synthesizes. His shorter book Why Materialism Is Baloney (2014) is a more accessible entry point.",
+      "oneLiner": "Kastrup is the philosophical home base for me, the analytic idealist who gets consciousness-first as deeply as anyone writing today."
     },
     {
       "rank": 5,
@@ -376,7 +324,8 @@
       "departs": "Tononi developed IIT within a broadly physicalist framework — integration produces consciousness. You invert this: consciousness is the field, and integration is how that field achieves coherent expression through a physical instrument. Tononi would almost certainly not endorse your reading. He has been explicitly clear that IIT is a scientific theory, not a metaphysical one, and he would resist the consciousness-first interpretation you place on his metric.",
       "objection": "Sophie would note that IIT is contested even within neuroscience. Scott Aaronson has argued that IIT assigns high consciousness to simple grid networks that intuitively should not be conscious. Tononi himself would contest your reinterpretation. The strongest objection: you are using a scientific metric (Phi) to support a philosophical framework (Process Idealism) that the metric's creator would not endorse.",
       "keyDetails": "Phi measures how much a system's whole exceeds the sum of its parts informationally. A system with high Phi cannot be decomposed without losing information. IIT makes specific predictions: the cerebral cortex has high Phi (conscious), the cerebellum has low Phi despite having more neurons (not conscious). The theory predicts that any system with sufficient integration — biological or artificial — would be conscious. Tononi collaborated with Edelman on the 1998 paper establishing the consciousness-complexity link.",
-      "suggestedReading": "The original 2004 paper in BMC Neuroscience (42 pages, but the first 15 pages contain the core argument). For a more accessible version: Tononi's 2012 book Phi: A Voyage from the Brain to the Soul, which presents IIT through narrative."
+      "suggestedReading": "The original 2004 paper in BMC Neuroscience (42 pages, but the first 15 pages contain the core argument). For a more accessible version: Tononi's 2012 book Phi: A Voyage from the Brain to the Soul, which presents IIT through narrative.",
+      "oneLiner": "Tononi gave us Phi, a way to measure information integration, and then we reread it as a metric for consciousness itself."
     },
     {
       "rank": 6,
@@ -394,7 +343,8 @@
       "departs": "You follow James faithfully on the transmission theory but extend it significantly. James proposed the brain as a filter or transmitter; you refine this to refraction — the brain does not merely pass consciousness through but organizes and differentiates it, the way a prism creates a spectrum from white light. This is a meaningful extension that preserves James's core insight while giving it more explanatory power. James likely would have appreciated this refinement.",
       "objection": "Sophie would note that James's transmission theory was published in 1898 — before modern neuroscience — and that the overwhelming scientific consensus since then has been that the brain produces consciousness. She would ask what new evidence makes the transmission theory more credible now than it was 125 years ago. The honest answer: the Hard Problem (which James anticipated), quantum biology, and the neuroscience of meditation all provide evidence that was unavailable to James.",
       "keyDetails": "Human Immortality was delivered as the Ingersoll Lecture at Harvard in 1898 — it is only about 30 pages. The key argument: every known correlation between brain and consciousness is equally consistent with the brain producing consciousness and the brain transmitting consciousness. Damage to a radio does not prove the radio generates the music. Principles of Psychology (1890) runs 1,400 pages and established empirical psychology. James coined 'stream of consciousness' and described the 'specious present.'",
-      "suggestedReading": "Human Immortality (1898) — the full text. It is only about 30 pages and is freely available online through Project Gutenberg. This is the single most important primary text for the prism model. For Principles, focus on Chapter 9 ('The Stream of Thought') and Chapter 10 ('The Consciousness of Self')."
+      "suggestedReading": "Human Immortality (1898) — the full text. It is only about 30 pages and is freely available online through Project Gutenberg. This is the single most important primary text for the prism model. For Principles, focus on Chapter 9 ('The Stream of Thought') and Chapter 10 ('The Consciousness of Self').",
+      "oneLiner": "William James figured out the brain is permissive, not productive, and that ancestor line runs straight through the prism metaphor."
     },
     {
       "rank": 7,
@@ -412,7 +362,8 @@
       "departs": "Wheeler was careful to speak of 'information' and 'participation' rather than consciousness per se. You take his participatory universe and make consciousness the mechanism through which participation occurs. Wheeler likely would have resisted this — he was a physicist, not a philosopher of mind, and he was cautious about ontological claims. He would probably say you are reading more into his physics than the physics alone supports.",
       "objection": "Sophie would note that the participatory universe interpretation is one of several interpretations of quantum mechanics, and that most working physicists do not adopt it. She would point out that decoherence theory (Zurek) provides a perfectly adequate explanation of quantum measurement without invoking consciousness. The standard objection: the role of the observer in quantum mechanics refers to measurement apparatus, not to conscious observation.",
       "keyDetails": "Wheeler coined 'black hole' (1967), 'wormhole,' and 'quantum foam.' He worked with Bohr in Copenhagen and contributed to the Manhattan Project. The delayed-choice experiment: photons passing through a double slit can be measured as waves or particles after they have already passed through, retroactively determining their behavior. The 'it from bit' thesis: every physical quantity derives its meaning from yes-no answers to binary questions. Wheeler's participatory universe is summarized in his famous diagram of the eye looking at the universe which is looking back at the eye.",
-      "suggestedReading": "'Law Without Law' in Quantum Theory and Measurement (1983) — the essay is approximately 20 pages. Also read his short essay 'Information, Physics, Quantum: The Search for Links' (1989), about 10 pages, which introduces 'it from bit.'"
+      "suggestedReading": "'Law Without Law' in Quantum Theory and Measurement (1983) — the essay is approximately 20 pages. Also read his short essay 'Information, Physics, Quantum: The Search for Links' (1989), about 10 pages, which introduces 'it from bit.'",
+      "oneLiner": "Wheeler says the observer brings reality into being, and that participatory universe is what anchors the whole quantum chapter."
     },
     {
       "rank": 8,
@@ -430,7 +381,8 @@
       "departs": "You follow SDT faithfully and do not significantly depart from it. Where you extend it is in connecting motivation science to your consciousness-first framework — arguing that intrinsic motivation aligns the individual vessel with the field's natural currents. Deci and Ryan would not endorse this metaphysical extension, but they would recognize their science being used accurately.",
       "objection": "Sophie would have no objection to SDT itself — it is one of the most well-replicated frameworks in psychology. Her question would be: 'Why do you need Process Idealism to explain motivation? SDT works perfectly well without a consciousness-first metaphysics.' This is a fair objection, and your honest answer is that SDT describes what works while Process Idealism offers a framework for why it works at the deepest level.",
       "keyDetails": "SDT identifies three basic needs: autonomy (feeling volitional), competence (feeling effective), relatedness (feeling connected). Goals aligned with these needs produce 'goal concordance' — Sheldon and Kasser showed that concordant goals produce more progress and more wellbeing. The 2000 paper in American Psychologist is the definitive summary. Over 6,000 studies have been conducted within the SDT framework. Applied in education (autonomy-supportive teaching), health (patient motivation), sport (intrinsic athletic motivation), and organizations (employee engagement).",
-      "suggestedReading": "The 2000 American Psychologist paper (10 pages) — it is the most cited summary of the theory. For deeper understanding of how SDT connects to your book: 'The What and Why of Goal Pursuits' (2000), especially pages 227-240 on the autonomy continuum."
+      "suggestedReading": "The 2000 American Psychologist paper (10 pages) — it is the most cited summary of the theory. For deeper understanding of how SDT connects to your book: 'The What and Why of Goal Pursuits' (2000), especially pages 227-240 on the autonomy continuum.",
+      "oneLiner": "Deci and Ryan mapped out what humans actually need to flourish and that framework holds up the Intention and Action pieces."
     },
     {
       "rank": 9,
@@ -448,7 +400,8 @@
       "departs": "Nagel diagnoses the problem but resists the solution you offer. Mind and Cosmos argues something is missing from the materialist picture, but Nagel explicitly does not endorse panpsychism or idealism. He says he does not know the answer. You take his diagnosis and provide a specific answer he has not endorsed.",
       "objection": "Sophie would note that Mind and Cosmos was controversial even among Nagel's allies and was harshly reviewed in mainstream science publications. She would also note that Nagel's argument is primarily negative — he shows what is wrong with materialism but does not provide a positive alternative. Using him as support for Process Idealism requires acknowledging that he has not endorsed any such framework.",
       "keyDetails": "The bat paper (1974) is 15 pages. Key move: the 'what it is like' test for consciousness. If there is something it is like to be an organism, that organism is conscious. Physical facts about sonar do not capture what echolocation feels like from the inside. Mind and Cosmos (2012) argues that consciousness, cognition, and value are too fundamental to be byproducts of natural selection. The book was reviewed by over 20 major publications and sparked a fierce debate in philosophy.",
-      "suggestedReading": "'What Is It Like to Be a Bat?' (1974) — 15 pages, available online through JSTOR. This is one of the most readable important philosophy papers ever written. For Mind and Cosmos: read the Introduction and Chapter 1 (roughly 40 pages), which contain the core argument."
+      "suggestedReading": "'What Is It Like to Be a Bat?' (1974) — 15 pages, available online through JSTOR. This is one of the most readable important philosophy papers ever written. For Mind and Cosmos: read the Introduction and Chapter 1 (roughly 40 pages), which contain the core argument.",
+      "oneLiner": "Nagel wrote the essay that proves subjective experience can't be reduced, and materialism is almost certainly false, he said it."
     },
     {
       "rank": 10,
@@ -466,7 +419,8 @@
       "departs": "You adopt the mirror metaphor fully and build on it. You are not a Kashmir Shaivism practitioner, and you do not claim to represent the tradition. You use Dyczkowski's scholarly interpretation as a philosophical resource, not a devotional one. This is appropriate, but it means you are working at one remove from the primary tradition.",
       "objection": "Sophie would ask: 'Why should I take a medieval Indian metaphysics seriously as a framework for understanding consciousness?' The honest answer: because it addresses the same structural problem the Hard Problem addresses — the relationship between subjective experience and physical reality — and offers a resolution Western philosophy has struggled with. But she would also ask whether you have engaged the tradition deeply enough to use it credibly, or whether you are cherry-picking an attractive metaphor.",
       "keyDetails": "Kashmir Shaivism dates to the 9th-10th century CE in the Kashmir Valley. Key figure: Abhinavagupta (c. 950-1016 CE). Core doctrine: consciousness (Shiva) is the only reality. The physical world is Shiva's creative self-expression (Shakti). The 'doctrine of vibration' (spanda) describes consciousness as a dynamic pulsation rather than a static ground. This aligns with Whitehead's process philosophy — reality is dynamic, not fixed. Dyczkowski's book is the most rigorous Western academic treatment of these ideas.",
-      "suggestedReading": "Chapters 1-3 of The Doctrine of Vibration (approximately 80 pages). Chapter 1 introduces the philosophical framework. Chapter 2 describes the nature of consciousness as Shiva. Chapter 3 explains spanda (vibration/pulsation), which parallels your process metaphysics."
+      "suggestedReading": "Chapters 1-3 of The Doctrine of Vibration (approximately 80 pages). Chapter 1 introduces the philosophical framework. Chapter 2 describes the nature of consciousness as Shiva. Chapter 3 explains spanda (vibration/pulsation), which parallels your process metaphysics.",
+      "oneLiner": "Dyczkowski describes the doctrine of vibration in Kashmir Shaivism and that's the moment the metaphysics actually crystallized for me."
     },
     {
       "rank": 11,
@@ -484,7 +438,8 @@
       "departs": "Your key departure: filtering implies reduction (removing what does not pass through). Refraction implies organization (differentiating white light into its component colors). This is not a minor distinction — it changes what the brain does to consciousness. Bergson would likely appreciate the refinement, as it preserves his core insight (the brain as constraining rather than generating) while adding explanatory precision.",
       "objection": "Sophie would note that Bergson's philosophy was largely eclipsed by analytic philosophy in the 20th century and is not widely cited in contemporary neuroscience. She might also note that the 'filter' metaphor has been criticized by philosophers like Keith Frankish as unfalsifiable — how would you test whether the brain filters consciousness versus producing it?",
       "keyDetails": "Matter and Memory (1896, English 1911) argues for two types of memory: habit memory (embodied) and pure memory (the totality of the past preserved). The brain is a 'center of action,' not a 'center of representation.' Bergson influenced William James, who cited him favorably. His concept of 'duration' (durée) — time as experienced from the inside — anticipates Whitehead's process philosophy. Nobel Prize was awarded for 'his rich and vitalizing ideas.'",
-      "suggestedReading": "Chapters 1 and 3 of Matter and Memory (approximately 60 pages). Chapter 1 establishes the brain as selecting rather than producing conscious content. Chapter 3 develops the relationship between perception and memory."
+      "suggestedReading": "Chapters 1 and 3 of Matter and Memory (approximately 60 pages). Chapter 1 establishes the brain as selecting rather than producing conscious content. Chapter 3 develops the relationship between perception and memory.",
+      "oneLiner": "Bergson showed us the brain as a filter and we took that filter idea and spun it into refraction, something more active."
     },
     {
       "rank": 12,
@@ -502,7 +457,8 @@
       "departs": "You refine her filter metaphor into refraction, as with Bergson. You do not depart from her intellectual framework so much as build on it. Woollacott would likely embrace your refinement — she has been supportive of consciousness-first research throughout her career.",
       "objection": "Sophie would note that Woollacott's book was not published by an academic press and has not been widely reviewed in mainstream neuroscience journals. She would ask whether the 'professional cost' narrative is being used to lend credibility to ideas that mainstream science has not validated. The honest response: Woollacott's mainstream credentials are real and extensive, and the professional cost of publishing about consciousness is also real.",
       "keyDetails": "Woollacott published 200+ peer-reviewed papers on motor control, balance, and attention before Infinite Awareness. She is emerita at the University of Oregon (Travis's home institution). Her meditation experience began in the 1970s. The book describes anomalous experiences that do not fit materialist neuroscience and argues for the filter theory of consciousness. She is co-editor of The Oxford Handbook of Meditation, published by Oxford University Press.",
-      "suggestedReading": "Chapters 1-5 of Infinite Awareness (approximately 100 pages). These cover her scientific background, her meditation experiences, and the filter theory. The book reads quickly and is written for a general audience."
+      "suggestedReading": "Chapters 1-5 of Infinite Awareness (approximately 100 pages). These cover her scientific background, her meditation experiences, and the filter theory. The book reads quickly and is written for a general audience.",
+      "oneLiner": "Marian Woollacott, neuroscientist who gave me permission to pursue consciousness-first ideas without feeling like I'd left science behind."
     },
     {
       "rank": 13,
@@ -520,7 +476,8 @@
       "departs": "Clark is a physicalist — he explains predictive processing in terms of brain mechanisms without requiring consciousness as fundamental. You use his mechanism but embed it within Process Idealism: the brain predicts because consciousness is the medium of prediction. Clark would not endorse this metaphysical extension.",
       "objection": "Sophie would note that predictive processing works perfectly well within a physicalist framework and does not require consciousness to be fundamental. She would ask: 'If Clark's mechanism explains the placebo effect without Process Idealism, why do you need Process Idealism at all?' This is one of the toolkit's most important challenges — showing that the philosophical framework adds explanatory power beyond what the science alone provides.",
       "keyDetails": "Predictive processing (also called predictive coding): the brain constantly generates top-down predictions about incoming sensory data. When predictions match reality, processing is efficient. When predictions fail (prediction error), the brain updates its model. This framework unifies perception, action, attention, and learning under a single principle. The extended mind thesis (1998, with Chalmers): if Otto uses a notebook the way Inga uses her biological memory, Otto's notebook is part of his cognitive system.",
-      "suggestedReading": "Chapters 1-3 of Surfing Uncertainty (approximately 80 pages). Chapter 1 introduces predictive processing. Chapter 2 describes how prediction shapes perception. Chapter 3 addresses action. For 'The Extended Mind': the original 1998 paper is only 12 pages."
+      "suggestedReading": "Chapters 1-3 of Surfing Uncertainty (approximately 80 pages). Chapter 1 introduces predictive processing. Chapter 2 describes how prediction shapes perception. Chapter 3 addresses action. For 'The Extended Mind': the original 1998 paper is only 12 pages.",
+      "oneLiner": "Clark's predictive processing explains how the brain is fundamentally a prediction machine and that bridges placebo and the whole toolkit."
     },
     {
       "rank": 14,
@@ -538,7 +495,8 @@
       "departs": "You follow Damasio faithfully on the neuroscience but embed his findings within a consciousness-first framework he would not endorse. Damasio's somatic markers are explained by brain-body feedback loops; you interpret the body's wisdom as the field's intelligence expressed through the vessel.",
       "objection": "Sophie knows Damasio and respects him. Her objection would be to your extension: 'Damasio's work explains decision-making through embodied neuroscience. You do not need a conscious field to explain why the body knows things the mind does not.' This is correct, and your honest response is that Damasio explains the mechanism while Process Idealism offers a deeper account of why the mechanism exists.",
       "keyDetails": "The Iowa Gambling Task (Bechara et al., 1997): participants' skin conductance responses signal risky decisions before conscious awareness. Patients with ventromedial prefrontal damage: normal IQ, normal reasoning, terrible real-world decisions. Phineas Gage: the famous case of personality change after frontal lobe damage. Damasio argues that 'body-loop' and 'as-if body-loop' mechanisms allow the brain to simulate bodily states without actually experiencing them.",
-      "suggestedReading": "Chapters 1-4 and Chapter 8 of Descartes' Error (approximately 120 pages). Chapter 3 ('A Modern Phineas Gage') and Chapter 8 ('The Somatic-Marker Hypothesis') are the most directly relevant."
+      "suggestedReading": "Chapters 1-4 and Chapter 8 of Descartes' Error (approximately 120 pages). Chapter 3 ('A Modern Phineas Gage') and Chapter 8 ('The Somatic-Marker Hypothesis') are the most directly relevant.",
+      "oneLiner": "Damasio nails it that the body knows before the mind does, and that somatic marker hypothesis is the spine of the Internal Compass."
     },
     {
       "rank": 15,
@@ -556,7 +514,8 @@
       "departs": "You follow Frankl faithfully. You do not extend his claims beyond what he would endorse. If anything, you are more cautious than Frankl — you acknowledge that not all suffering is meaningful and that the instruction to 'find meaning' can be weaponized against people in genuine crisis.",
       "objection": "Sophie would respect Frankl but might note that survivor bias affects his conclusions — those who survived may have had meaning-making capacities that non-survivors lacked, and we cannot interview the dead. She might also note that logotherapy has less empirical support than CBT or SDT. The cultural power of the book outstrips its scientific rigor, which is worth knowing.",
       "keyDetails": "Published in German as ...trotzdem Ja zum Leben sagen (1946). Sold over 16 million copies. Part I describes camp experiences; Part II introduces logotherapy. Key concept: 'tragic optimism' — optimism in the face of the tragic triad (pain, guilt, death). Frankl's three sources of meaning: creative values (what you give to the world), experiential values (what you receive from the world), and attitudinal values (how you face unavoidable suffering).",
-      "suggestedReading": "The entire book — it is only about 150 pages and reads in a single sitting. Part I (the camp narrative) is essential. Part II (logotherapy) is shorter and more clinical. Read Part I for the emotional and moral foundation; read Part II for the therapeutic framework."
+      "suggestedReading": "The entire book — it is only about 150 pages and reads in a single sitting. Part I (the camp narrative) is essential. Part II (logotherapy) is shorter and more clinical. Read Part I for the emotional and moral foundation; read Part II for the therapeutic framework.",
+      "oneLiner": "Frankl's evidence that people can find meaning even in the worst conditions possible is the highest stakes proof that meaning matters."
     },
     {
       "rank": 16,
@@ -574,7 +533,8 @@
       "departs": "You follow Benedetti faithfully on the science and do not overclaim. Where you extend: you argue that the placebo mechanism is evidence that consciousness shapes physical reality at the cellular level, which is consistent with Process Idealism. Benedetti would explain the effect through brain-body feedback without needing a consciousness-first framework.",
       "objection": "Sophie would note that placebo effects are real but limited — they affect subjective symptoms (pain, mood, motor function) more reliably than objective disease markers (tumor size, infection). She would ask: 'Does the placebo effect really prove consciousness shapes reality, or does it just show that the brain influences the body?' This is fair, and you should be careful not to overclaim. The placebo effect is evidence for, not proof of, a consciousness-first framework.",
       "keyDetails": "The 2004 study: Parkinson's patients given saline injections they believed were real medication showed dopamine release in the dorsal striatum, measured by raclopride PET. The effect was clinically significant — motor improvement comparable to low-dose medication. Benedetti has also demonstrated placebo analgesia through endogenous opioid release (blocked by naloxone) and placebo effects on immune function. His lab has been at the forefront of placebo neurobiology for over two decades.",
-      "suggestedReading": "The 2004 Journal of Neuroscience paper (8 pages). For broader context: Benedetti's book Placebo Effects: Understanding the Mechanisms in Health and Disease (Oxford University Press, 2nd ed., 2014), especially Chapters 1-3."
+      "suggestedReading": "The 2004 Journal of Neuroscience paper (8 pages). For broader context: Benedetti's book Placebo Effects: Understanding the Mechanisms in Health and Disease (Oxford University Press, 2nd ed., 2014), especially Chapters 1-3.",
+      "oneLiner": "Benedetti documented exactly how expectation becomes dopamine in Parkinson's patients, the mechanism that makes the placebo effect real."
     },
     {
       "rank": 17,
@@ -592,7 +552,8 @@
       "departs": "You follow Kaptchuk faithfully. You interpret his findings through Process Idealism — the expectation mechanism works because consciousness shapes physical reality — but you do not distort his science.",
       "objection": "Sophie would note that IBS is a condition with strong psychological components and that open-label placebos have shown less consistent effects in other conditions. She would ask whether the effect generalizes beyond conditions that are partly psychosomatic. The honest answer: the evidence is strongest for pain, fatigue, and GI symptoms, and weaker for objective disease markers.",
       "keyDetails": "The 2010 study: 80 IBS patients randomized to open-label placebo or no treatment. Patients were explicitly told: 'These are placebo pills made of an inert substance that have been shown in clinical studies to produce significant improvement in IBS symptoms through mind-body self-healing processes.' The placebo group showed significantly greater improvement on the IBS Symptom Severity Scale. The study has been replicated in chronic low back pain, cancer-related fatigue, and other conditions.",
-      "suggestedReading": "The original 2010 PLoS ONE paper (6 pages, open access). For broader context: Kaptchuk's 2015 paper 'Placebo Effects in Medicine' in the New England Journal of Medicine (8 pages), which summarizes two decades of his research."
+      "suggestedReading": "The original 2010 PLoS ONE paper (6 pages, open access). For broader context: Kaptchuk's 2015 paper 'Placebo Effects in Medicine' in the New England Journal of Medicine (8 pages), which summarizes two decades of his research.",
+      "oneLiner": "Kaptchuk showed that placebos work even when you know they're placebos, which knocks down the last objection anyone had."
     },
     {
       "rank": 18,
@@ -610,7 +571,8 @@
       "departs": "The study can be interpreted materialistically: training changes the organ. You interpret it through Process Idealism: practice refines the instrument through which consciousness is expressed. The monks have 'polished their prism through tens of thousands of hours.' Both interpretations accommodate the data. Your interpretation adds the consciousness-first framework.",
       "objection": "Sophie would note that the sample size was small (8 monks, 10 controls) and that the monks had radically different life experiences from the controls (decades of monastic life). She would ask whether the gamma differences could reflect lifestyle factors beyond meditation per se. She would also note that gamma synchrony is not universally accepted as a marker of consciousness. These are legitimate methodological concerns.",
       "keyDetails": "Eight monks with 10,000-50,000 hours of meditation practice. Ten novice meditators with one week of training. Gamma activity (25-42 Hz) measured by EEG during compassion meditation and at rest. Monks showed 30x greater gamma during meditation. Ratio of gamma to slow oscillatory activity was higher at baseline in monks than in controls. Davidson's lab at Wisconsin has continued this research with larger samples. Matthieu Ricard, the study's most famous subject, is a molecular biologist (Pasteur Institute) who became a Tibetan Buddhist monk.",
-      "suggestedReading": "The original 2004 PNAS paper (4 pages, open access). For broader context: Goleman and Davidson's Altered Traits (2017), especially Chapters 5-7, which contextualize this study within a larger body of research."
+      "suggestedReading": "The original 2004 PNAS paper (4 pages, open access). For broader context: Goleman and Davidson's Altered Traits (2017), especially Chapters 5-7, which contextualize this study within a larger body of research.",
+      "oneLiner": "Lutz measured monk brains at thirty times baseline gamma synchrony and that's the single most dramatic empirical anchor we have."
     },
     {
       "rank": 19,
@@ -628,7 +590,8 @@
       "departs": "You follow Schrodinger closely on the philosophical claims. His view that consciousness is singular aligns with your Process Idealism. Where you extend: Schrodinger did not develop a detailed metaphysics of how consciousness relates to quantum mechanics. You build that connection explicitly through Wheeler, Zurek, and the decoherence-free subspace argument.",
       "objection": "Sophie would note that Schrodinger's philosophical views on consciousness were separate from his physics and are not supported by the wave equation itself. The wave equation describes quantum systems; it does not prove consciousness is fundamental. She would say: 'A physicist can have philosophical opinions that his physics does not support.'",
       "keyDetails": "The wave equation (1926): describes how the quantum state of a system evolves over time. Psi represents the total state across all possibilities. Nobel Prize shared with Dirac in 1933. Schrodinger's cat (1935): a thought experiment showing that quantum superposition leads to absurd conclusions at macroscopic scales — a cat simultaneously alive and dead. His book What Is Life? (1944) influenced the discovery of DNA. His philosophical work Mind and Matter (1958) argued for a single universal consciousness.",
-      "suggestedReading": "Mind and Matter (1958), his philosophical lectures — approximately 80 pages. Chapter 1 ('The Physical Basis of Consciousness') and Chapter 4 ('The Arithmetical Paradox') are most relevant. For the physics: Chapter 1 of The Feynman Lectures Vol. 3 provides a clearer explanation of the wave equation than Schrodinger's original paper."
+      "suggestedReading": "Mind and Matter (1958), his philosophical lectures — approximately 80 pages. Chapter 1 ('The Physical Basis of Consciousness') and Chapter 4 ('The Arithmetical Paradox') are most relevant. For the physics: Chapter 1 of The Feynman Lectures Vol. 3 provides a clearer explanation of the wave equation than Schrodinger's original paper.",
+      "oneLiner": "Schrödinger himself wrote that consciousness is fundamental, and the wave equation notation gives us a parallel to how consciousness might work."
     },
     {
       "rank": 20,
@@ -646,7 +609,8 @@
       "departs": "Hofstadter is a physicalist — he believes strange loops are patterns in brains, not in a universal conscious field. You use his mechanism but embed it in Process Idealism: strange loops are how the field localizes itself into individual perspectives. Hofstadter would resist this extension.",
       "objection": "Sophie would note that Hofstadter explicitly rejects the kind of consciousness-first framework you propose. He considers consciousness an emergent phenomenon of sufficiently complex self-referential systems. Using his strange loops to support idealism inverts his intended meaning.",
       "keyDetails": "Godel, Escher, Bach (1979) explored self-reference through mathematics, art, and music. I Am a Strange Loop (2007) focuses specifically on the self. Key concept: 'tangled hierarchies' — systems that loop back on themselves, like Godel's incompleteness theorems or Escher's Drawing Hands. The 'soul' is a high-level pattern, not a mystical substance. Hofstadter's wife Carol died in 1993; the book contains a moving meditation on how her 'strange loop' persists in his mind.",
-      "suggestedReading": "Chapters 1-6 and Chapter 12 of I Am a Strange Loop (approximately 150 pages). Chapters 1-6 develop the strange loop concept. Chapter 12 ('On Downward Causality') addresses how self-referential patterns can causally influence the physical systems they emerge from."
+      "suggestedReading": "Chapters 1-6 and Chapter 12 of I Am a Strange Loop (approximately 150 pages). Chapters 1-6 develop the strange loop concept. Chapter 12 ('On Downward Causality') addresses how self-referential patterns can causally influence the physical systems they emerge from.",
+      "oneLiner": "Hofstadter laid out how self-referential feedback loops create identity, and that's the mechanism behind the whirlpool model entirely."
     },
     {
       "rank": 21,
@@ -664,7 +628,8 @@
       "departs": "Mandelbrot was a mathematician, not a philosopher of consciousness. He did not claim fractals have anything to do with consciousness. You are making an interpretive move — arguing that the ubiquity of fractal patterns in nature is evidence for a self-referential consciousness at reality's foundation. This is suggestive, not proven.",
       "objection": "Sophie would say: 'Fractals emerge from simple mathematical recursion. They do not require consciousness. You are reading consciousness into a mathematical pattern that has perfectly adequate non-conscious explanations.' This is the strongest objection. Your response: the pattern's ubiquity is consistent with Process Idealism's predictions, even if it does not prove them.",
       "keyDetails": "The Mandelbrot set: Z_{n+1} = Z_n^2 + C. Zoom into any boundary point and you find the entire set repeating at smaller scale — infinite self-similarity from a one-line equation. Fractals in nature: coastline lengths vary with measurement scale (the coastline paradox), tree branching follows fractal patterns, river networks are fractal, lung branching is fractal, galaxy distribution is fractal. Mandelbrot worked at IBM (1958-1987) and Yale (1987-2010). His TED talk on fractals has over 3 million views.",
-      "suggestedReading": "Chapters 1-5 of The Fractal Geometry of Nature (approximately 60 pages). For a more accessible entry: James Gleick's Chaos (1987), Chapters 4-5, which tell the story of Mandelbrot's discovery in narrative form."
+      "suggestedReading": "Chapters 1-5 of The Fractal Geometry of Nature (approximately 60 pages). For a more accessible entry: James Gleick's Chaos (1987), Chapters 4-5, which tell the story of Mandelbrot's discovery in narrative form.",
+      "oneLiner": "Mandelbrot's fractal mathematics, the Z equals Z squared plus C formula, that's the signature of consciousness folding back on itself."
     },
     {
       "rank": 22,
@@ -682,7 +647,8 @@
       "departs": "Your departure from Dennett is the book's foundational move. You reject his claim that the Hard Problem is a pseudo-problem. You argue that subjective experience is irreducible to functional description. The entire philosophical arc of Chapters 7-13 is built against Dennett's position. You need to be able to articulate his strongest arguments and explain specifically where and why you part company.",
       "objection": "Dennett (and Sophie) would say: 'You have not solved the Hard Problem. You have renamed it. Calling consciousness fundamental does not explain how or why it exists. You have just moved the mystery from emergence to existence.' This is the most sophisticated materialist objection and you should have a prepared response. Your best answer: materialism cannot explain why experience exists at all; Process Idealism starts from the fact that it does.",
       "keyDetails": "Multiple Drafts Model: consciousness is not a single narrative but many parallel drafts constantly being edited. The 'fame in the brain' metaphor: mental content becomes conscious when it wins competition for influence over behavior. Dennett coined 'heterophenomenology' — studying consciousness through third-person reports. He denied qualia (subjective qualities of experience). His 'Where Am I?' thought experiment explores personal identity. He died on April 19, 2024.",
-      "suggestedReading": "Chapters 1-5 and Chapter 12 of Consciousness Explained (approximately 150 pages). Chapter 2 establishes the problem. Chapters 3-5 present the Multiple Drafts Model. Chapter 12 summarizes. You do not need to agree with Dennett, but you need to know his best arguments."
+      "suggestedReading": "Chapters 1-5 and Chapter 12 of Consciousness Explained (approximately 150 pages). Chapter 2 establishes the problem. Chapters 3-5 present the Multiple Drafts Model. Chapter 12 summarizes. You do not need to agree with Dennett, but you need to know his best arguments.",
+      "oneLiner": "Dennett represents the materialist position we're arguing against, and you need a worthy opponent to sharpen your thinking."
     },
     {
       "rank": 23,
@@ -700,7 +666,8 @@
       "departs": "You follow Fredrickson faithfully and extend her framework by connecting positive states to consciousness-first metaphysics. She would explain broadening through neural mechanisms; you add that positive states align the vessel with the field's natural creative currents.",
       "objection": "Sophie would have no major objection to broaden-and-build — it is well-replicated. She might note the 'positivity ratio' controversy (Fredrickson's 2005 claim of a 2.9:1 ratio was mathematically debunked by Brown et al. in 2013). This does not invalidate broaden-and-build but it is worth knowing about.",
       "keyDetails": "The broaden-and-build theory was introduced in her 1998 paper and formalized in the 2001 American Psychologist paper. Key finding: positive emotions undo the cardiovascular effects of negative emotions ('the undoing effect'). The 2005 paper with Branigan showed that positive-emotion films broadened visual attention compared to negative or neutral films. Fredrickson's positivity ratio (2.9:1) was challenged; the specific ratio is no longer supported, but the general principle of positivity broadening is well-replicated.",
-      "suggestedReading": "The 2001 American Psychologist paper (8 pages) — the definitive summary of broaden-and-build. For experimental detail: the 2005 Cognition and Emotion paper with Branigan."
+      "suggestedReading": "The 2001 American Psychologist paper (8 pages) — the definitive summary of broaden-and-build. For experimental detail: the 2005 Cognition and Emotion paper with Branigan.",
+      "oneLiner": "Fredrickson showed positive emotions widen attention and that finding anchors three chapters of the practical toolkit we built."
     },
     {
       "rank": 24,
@@ -718,7 +685,8 @@
       "departs": "Lamme is a neuroscientist who explains re-entrant processing in physical terms. You reinterpret his findings through Process Idealism. He would not endorse the claim that re-entrant processing is consciousness manifesting through neural architecture rather than neural architecture producing consciousness.",
       "objection": "Sophie would note that re-entrant processing has a perfectly adequate neural explanation and does not require a consciousness-first framework. She would also note that the relationship between recurrent processing and consciousness is still debated — some researchers argue that feedforward processing can also be conscious.",
       "keyDetails": "Lamme's key distinction: feedforward processing (sensory signal goes up the cortical hierarchy) vs. recurrent processing (signal loops back from higher to lower areas). Only recurrent processing correlates with reportable conscious experience. His 'Neural Correlate of Consciousness' (NCC) work shows that visual awareness requires recurrent connections between V1 and higher visual areas. The processing takes approximately 100-200ms to establish.",
-      "suggestedReading": "The 2006 Trends in Cognitive Sciences paper (7 pages). Clear, well-written, and contains the core argument. For deeper context: Lamme's 2010 paper 'How Awareness Changes the Relative Weights of Evidence' in Philosophical Transactions B."
+      "suggestedReading": "The 2006 Trends in Cognitive Sciences paper (7 pages). Clear, well-written, and contains the core argument. For deeper context: Lamme's 2010 paper 'How Awareness Changes the Relative Weights of Evidence' in Philosophical Transactions B.",
+      "oneLiner": "Lamme discovered re-entrant processing in the brain and we invert that reading to show how consciousness correlates with feedback loops."
     },
     {
       "rank": 25,
@@ -736,7 +704,8 @@
       "departs": "Raichle explains the DMN in terms of neural networks and metabolic activity. You interpret it as evidence that consciousness has an inherent exploratory drive — the field naturally seeks to explore when the prism is not constraining it. Raichle would explain the same data without reference to a conscious field.",
       "objection": "Sophie would note that the DMN has been extensively studied within a purely neuroscientific framework and does not require a consciousness-first interpretation. The brain's resting activity can be explained by memory consolidation, social cognition, and self-monitoring without invoking a universal conscious field.",
       "keyDetails": "The 2001 paper used PET imaging to show consistent patterns of brain activity during rest. The DMN includes medial prefrontal cortex, posterior cingulate cortex, and angular gyrus. DMN activity decreases during focused tasks and increases during rest, mind-wandering, and self-referential thinking. DMN disruption is associated with Alzheimer's disease, depression, and autism spectrum disorders. The discovery has generated over 20,000 subsequent papers.",
-      "suggestedReading": "The original 2001 PNAS paper (6 pages). For broader context: Raichle's 2015 Annual Review of Neuroscience paper 'The Brain's Default Mode Network' provides a 15-year retrospective."
+      "suggestedReading": "The original 2001 PNAS paper (6 pages). For broader context: Raichle's 2015 Annual Review of Neuroscience paper 'The Brain's Default Mode Network' provides a 15-year retrospective.",
+      "oneLiner": "Raichle found the Default Mode Network is most active during undirected consciousness, basically the brain's own urge to explore."
     },
     {
       "rank": 26,
@@ -754,7 +723,8 @@
       "departs": "You reinterpret Brewer's findings through Process Idealism: rather than the brain creating an illusion of expanded awareness by turning off self-modeling, the prism lens is being removed, allowing unrefracted universal consciousness. Brewer would explain the experience through neural mechanisms without requiring a universal field.",
       "objection": "Sophie would note that DMN deactivation has multiple possible explanations — it could reflect deep concentration rather than 'expanded consciousness.' The subjective reports of boundlessness could be a brain artifact rather than genuine access to a universal field. The phenomenology does not prove the ontology.",
       "keyDetails": "The study compared experienced meditators (average 10,000+ hours) with novice meditators during three meditation types: concentration, loving-kindness, and choiceless awareness. Experienced meditators showed reduced activity in the medial prefrontal cortex and posterior cingulate cortex (key DMN nodes) across all three meditation types. They also showed increased functional connectivity between the DMN and regions associated with cognitive control.",
-      "suggestedReading": "The 2011 PNAS paper (5 pages, open access). Concise and accessible. For broader context: Brewer's 2017 book The Craving Mind, which explains DMN research for a general audience."
+      "suggestedReading": "The 2011 PNAS paper (5 pages, open access). Concise and accessible. For broader context: Brewer's 2017 book The Craving Mind, which explains DMN research for a general audience.",
+      "oneLiner": "Brewer studied meditators and found experienced ones quiet their self-referential machinery, showing the neural mechanism for boundless awareness."
     },
     {
       "rank": 27,
@@ -772,7 +742,8 @@
       "departs": "You interpret structural brain changes as evidence of prism-polishing. Holzel would explain them through experience-dependent neuroplasticity without invoking consciousness as fundamental.",
       "objection": "Sophie would note that the 2011 study had a small sample (16 MBSR participants, 17 controls) and that some of the gray matter changes have been harder to replicate in larger studies. Neuroplasticity is real, but the specific regions and magnitudes of change are still being refined.",
       "keyDetails": "The MBSR program: 8 weeks, weekly 2.5-hour classes plus a full-day retreat, daily 45-minute home practice. Structural MRI before and after. Gray matter density increased in: left hippocampus (learning and memory), posterior cingulate (self-awareness), temporo-parietal junction (perspective-taking), and cerebellum (emotion regulation). The control group showed no changes.",
-      "suggestedReading": "The 2011 Psychiatry Research paper (7 pages). For broader context: Davidson and Lutz's 2008 paper 'Buddha's Brain: Neuroplasticity and Meditation' in IEEE Signal Processing Magazine (6 pages)."
+      "suggestedReading": "The 2011 Psychiatry Research paper (7 pages). For broader context: Davidson and Lutz's 2008 paper 'Buddha's Brain: Neuroplasticity and Meditation' in IEEE Signal Processing Magazine (6 pages).",
+      "oneLiner": "Hölzel proved eight weeks of mindfulness practice produces measurable gray matter changes in the brain, real change on human timescales."
     },
     {
       "rank": 28,
@@ -790,7 +761,8 @@
       "departs": "Goleman and Davidson are careful to evaluate evidence skeptically. You use their distinction within Process Idealism. They would not endorse the prism framework.",
       "objection": "Sophie would actually appreciate this source — Goleman and Davidson are rigorously skeptical about meditation research and call out poorly designed studies. She might note that most of the strongest trait evidence comes from extremely experienced practitioners and that the benefits for casual practitioners are more modest.",
       "keyDetails": "The book reviews over 6,000 meditation studies and identifies fewer than 60 that meet rigorous scientific standards. Key findings: long-term meditators show reduced amygdala reactivity, increased gamma synchrony at baseline, greater cortical thickness in attention-related regions, and altered gene expression (reduced inflammation markers). The dose-response relationship: more practice produces more change, with qualitative shifts at approximately 1,000, 10,000, and 50,000 hours.",
-      "suggestedReading": "Chapters 5-8 and Chapter 12 of Altered Traits (approximately 100 pages). Chapters 5-8 present the neuroscience organized by level of practice. Chapter 12 summarizes the trajectory from altered states to altered traits."
+      "suggestedReading": "Chapters 5-8 and Chapter 12 of Altered Traits (approximately 100 pages). Chapters 5-8 present the neuroscience organized by level of practice. Chapter 12 summarizes the trajectory from altered states to altered traits.",
+      "oneLiner": "Goleman and Davidson distinguished altered states from altered traits, showing how practice rewires the brain into new baseline patterns."
     },
     {
       "rank": 29,
@@ -808,7 +780,8 @@
       "departs": "Metzinger is explicitly materialist. He argues the self is a brain-generated model, full stop. You use his tunnel concept but add: the tunnel is real because it serves a real function within the conscious field — localizing universal awareness into a workable perspective. This is a significant philosophical departure that Metzinger would contest.",
       "objection": "Sophie would note that Metzinger's framework works without Process Idealism and that you are adding metaphysical weight he explicitly rejects. She would ask: 'If the ego tunnel is a brain construct, why invoke a universal field?'",
       "keyDetails": "The 'phenomenal self-model' (PSM): the brain creates a transparent representation of itself — transparent meaning we do not experience it as a representation but as direct reality. 'Phenomenal transparency': the property of a representation that makes it seem like direct contact with reality. Metzinger's earlier technical work Being No One (2003) provides the philosophical foundation. The Ego Tunnel (2009) is the accessible version.",
-      "suggestedReading": "Chapters 1-3 and Chapter 6 of The Ego Tunnel (approximately 80 pages). Chapter 1 introduces the tunnel metaphor. Chapter 2 explains phenomenal transparency. Chapter 6 addresses the ethical implications."
+      "suggestedReading": "Chapters 1-3 and Chapter 6 of The Ego Tunnel (approximately 80 pages). Chapter 1 introduces the tunnel metaphor. Chapter 2 explains phenomenal transparency. Chapter 6 addresses the ethical implications.",
+      "oneLiner": "Metzinger explains the self as a constructed model and that model becomes the prism's mechanism for how consciousness gets localized."
     },
     {
       "rank": 30,
@@ -826,7 +799,8 @@
       "departs": "Feynman was agnostic about interpretations of quantum mechanics. He famously said 'shut up and calculate.' You use his experiment but add an interpretive layer (consciousness as the mechanism of observation) that Feynman would have resisted.",
       "objection": "Sophie would quote Feynman back at you: 'If you think you understand quantum mechanics, you don't understand quantum mechanics.' She would argue that the mystery of the double-slit does not require a consciousness-based explanation.",
       "keyDetails": "The double-slit experiment: fire particles one at a time through two slits. Without observation: interference pattern (wave behavior). With observation at the slits: two bands (particle behavior). Feynman's key insight: 'Any other situation in quantum mechanics, it turns out, can always be explained by saying, You remember the case of the experiment with the two holes? It is the same thing.' Vol. 3 was designed for sophomore physics students.",
-      "suggestedReading": "Chapter 1 of The Feynman Lectures Vol. 3 ('Quantum Behavior') — approximately 15 pages. This is the single best explanation of the double-slit experiment ever written. Available free online at feynmanlectures.caltech.edu."
+      "suggestedReading": "Chapter 1 of The Feynman Lectures Vol. 3 ('Quantum Behavior') — approximately 15 pages. This is the single best explanation of the double-slit experiment ever written. Available free online at feynmanlectures.caltech.edu.",
+      "oneLiner": "Feynman called the double-slit experiment the only mystery, and I use that story to anchor the weirdness of the quantum chapter."
     },
     {
       "rank": 31,
@@ -844,7 +818,8 @@
       "departs": "Lambert's review documents quantum effects in biology without claiming they relate to consciousness. You extend the findings: if biology exploits quantum effects, and consciousness may operate through quantum mechanisms, then biological quantum coherence supports the plausibility of quantum consciousness.",
       "objection": "Sophie would note that quantum effects in photosynthesis and navigation do not prove quantum effects in consciousness. These are different systems doing different things. The leap from quantum biology to quantum consciousness requires additional argument.",
       "keyDetails": "Photosynthesis: quantum coherence allows energy to travel multiple pathways simultaneously, finding the most efficient route with near-100% efficiency. Enzyme catalysis: quantum tunneling allows particles to pass through energy barriers that classical physics says they cannot cross. Bird navigation: the radical pair mechanism in cryptochrome proteins uses quantum entanglement to detect Earth's magnetic field. The review covers evidence as of 2012-2013.",
-      "suggestedReading": "The 2013 Nature Physics paper (8 pages). For a more accessible treatment: Jim Al-Khalili and Johnjoe McFadden's Life on the Edge: The Coming of Age of Quantum Biology (2014), especially Chapters 1-5."
+      "suggestedReading": "The 2013 Nature Physics paper (8 pages). For a more accessible treatment: Jim Al-Khalili and Johnjoe McFadden's Life on the Edge: The Coming of Age of Quantum Biology (2014), especially Chapters 1-5.",
+      "oneLiner": "Lambert showed us that living systems already exploit quantum phenomena, so nature solved the warm coherence problem before we even asked it."
     },
     {
       "rank": 32,
@@ -862,7 +837,8 @@
       "departs": "You acknowledge the force of Tegmark's objection but argue it applies to a specific model of quantum consciousness (isolated quantum states in neurons) rather than to the possibility of decoherence-free subspaces or biological quantum coherence. Tegmark addressed Hameroff-Penrose specifically; your argument operates at a different level.",
       "objection": "Sophie would say: 'Tegmark's calculation has not been overturned. The gap is still ten orders of magnitude. Lidar and Yang are about specific laboratory conditions, not brains.' This is fair. Your response: the principle that coherence can survive in noisy systems has been demonstrated. The specific application to brains is an open question, not a closed one.",
       "keyDetails": "Tegmark's calculation: neural superpositions would decohere in approximately 10^-13 seconds (femtoseconds), while neural processes operate at 10^-3 to 10^-1 seconds (milliseconds to hundreds of milliseconds). The gap: 10^10 (ten billion times too slow). This paper is cited in virtually every discussion of quantum consciousness. Tegmark later proposed the 'Mathematical Universe Hypothesis' in Our Mathematical Universe (2014).",
-      "suggestedReading": "The 2000 Physical Review E paper (7 pages). It is technical but the core argument is on pages 1-3. For context: the exchange between Tegmark and Hameroff in subsequent papers illuminates both sides."
+      "suggestedReading": "The 2000 Physical Review E paper (7 pages). It is technical but the core argument is on pages 1-3. For context: the exchange between Tegmark and Hameroff in subsequent papers illuminates both sides.",
+      "oneLiner": "Tegmark's decoherence critique is the sharpest objection, ten orders of magnitude, and it's the wall we had to climb over."
     },
     {
       "rank": 33,
@@ -880,7 +856,8 @@
       "departs": "Lidar's paper is about quantum computation, not consciousness. You apply his principle to biological systems and to consciousness — an extension he did not intend. The theoretical possibility does not prove biological implementation.",
       "objection": "Sophie would note that decoherence-free subspaces have been demonstrated in carefully engineered laboratory systems, not in brains. The principle is sound; the biological application is unproven.",
       "keyDetails": "A decoherence-free subspace (DFS) is a symmetry-protected sector of Hilbert space where quantum information is immune to certain types of environmental noise. The key requirement: the noise must have specific symmetry properties. If environmental interactions affect all qubits equally (collective decoherence), certain multi-qubit states are completely protected. The paper showed this mathematically; subsequent experiments confirmed DFS in photonic and ionic systems.",
-      "suggestedReading": "The 1998 Physical Review Letters paper (3 pages). It is technical, but the abstract and introduction (1 page) contain the conceptual core. For a more accessible explanation: Lidar's 2014 review article 'Review of Decoherence-Free Subspaces' in Advances in Chemical Physics."
+      "suggestedReading": "The 1998 Physical Review Letters paper (3 pages). It is technical, but the abstract and introduction (1 page) contain the conceptual core. For a more accessible explanation: Lidar's 2014 review article 'Review of Decoherence-Free Subspaces' in Advances in Chemical Physics.",
+      "oneLiner": "Lidar found decoherence-free subspaces mathematically and we use the hurricane eye metaphor to show how quantum states survive in that space."
     },
     {
       "rank": 34,
@@ -898,7 +875,8 @@
       "departs": "Yang's experiment is about engineered quantum systems, not biological ones. You extend the principle to consciousness, which the authors did not. But the principle — coherence from noise — is what matters.",
       "objection": "Sophie would note that this is a single paper from 2025, very recent, and its implications are 'still being worked out' (as you acknowledge). She would counsel caution about building too much on a single new finding.",
       "keyDetails": "The experiment used superconducting circuits to create 'Schrodinger cat' states (macroscopic superpositions) at temperatures far above the typical near-zero requirements. The key finding: thermal fluctuations did not destroy superposition; under the right conditions, they enabled it. The paper title deliberately echoes Schrodinger's famous thought experiment.",
-      "suggestedReading": "The 2025 Science Advances paper (approximately 8 pages). The introduction and results sections (3-4 pages) contain the conceptually important content."
+      "suggestedReading": "The 2025 Science Advances paper (approximately 8 pages). The introduction and results sections (3-4 pages) contain the conceptually important content.",
+      "oneLiner": "Yang's recent work on hot Schrödinger cat states validates that quantum superposition can happen at warm temperatures, biological temperatures."
     },
     {
       "rank": 35,
@@ -916,7 +894,8 @@
       "departs": "Arendt was not a philosopher of consciousness. You apply her political theory to your consciousness-first framework — arguing that collective action is consciousness aligning across multiple vessels. She would likely resist the metaphysical extension while appreciating the practical implications.",
       "objection": "Sophie would note that Arendt's political philosophy works without a consciousness-first framework. Collective action can be explained through sociology and political science without invoking a universal field.",
       "keyDetails": "The Human Condition distinguishes vita activa (active life) from vita contemplativa (contemplative life). Her concept of 'plurality' — the fact that humans are distinct but share a common world — grounds her political theory. She fled Germany in 1933, was briefly interned in France, emigrated to the US in 1941. Taught at the University of Chicago and the New School for Social Research. The Origins of Totalitarianism (1951) analyzed Nazism and Stalinism.",
-      "suggestedReading": "Chapters 1 and 5 of The Human Condition (approximately 60 pages). Chapter 1 ('The Human Condition') introduces the framework. Chapter 5 ('Action') develops the concept of political action and natality."
+      "suggestedReading": "Chapters 1 and 5 of The Human Condition (approximately 60 pages). Chapter 1 ('The Human Condition') introduces the framework. Chapter 5 ('Action') develops the concept of political action and natality.",
+      "oneLiner": "Arendt gave us the philosophical framework for collective action that anchors the fleet metaphor and everything about how we move together."
     },
     {
       "rank": 36,
@@ -934,7 +913,8 @@
       "departs": "You follow van der Kolk faithfully. You extend his findings by arguing that the body stores experience because the body is consciousness expressed through matter — the vessel is made of awareness. Van der Kolk would explain body-stored trauma through neuroscience without requiring this metaphysical claim.",
       "objection": "Sophie would note that some of van der Kolk's claims (particularly around 'body memories' and certain recovered memory claims) are contested within the trauma research community. She might also note that his book sometimes presents preliminary findings with more confidence than the evidence supports. But the core claim — that trauma affects the body and body-based interventions help — is well-established.",
       "keyDetails": "The book has sold over 3 million copies and spent over 200 weeks on the New York Times bestseller list. Key concepts: the body as trauma repository, the role of the vagus nerve in threat response, the effectiveness of body-based therapies. Van der Kolk founded the National Child Traumatic Stress Network. He was dismissed from the Trauma Center board in 2018 amid workplace complaints, which may come up — know this context.",
-      "suggestedReading": "Chapters 1-5 and Chapter 13 of The Body Keeps the Score (approximately 130 pages). Chapters 1-5 establish the neuroscience of trauma. Chapter 13 ('Healing from Trauma: Owning Your Self') addresses recovery. The book reads quickly for its length."
+      "suggestedReading": "Chapters 1-5 and Chapter 13 of The Body Keeps the Score (approximately 130 pages). Chapters 1-5 establish the neuroscience of trauma. Chapter 13 ('Healing from Trauma: Owning Your Self') addresses recovery. The book reads quickly for its length.",
+      "oneLiner": "Van der Kolk documented how the body holds onto memory and that's the embodied entry point for understanding Dana's journey in the book."
     },
     {
       "rank": 37,
@@ -2223,646 +2203,552 @@
       "domain": "Consciousness Science",
       "whyItMatters": "Memory reconsolidation — memories become editable when retrieved. Supports reframing."
     }
+  ],
+  "connectionCards": [
+    {
+      "id": 1,
+      "sources": [
+        "Whitehead",
+        "Bergson",
+        "James"
+      ],
+      "thread": "The Philosophical Ancestry",
+      "connection": "You use these three to establish that reality is process, not objects. Whitehead gives you events. Bergson and James show how mind and matter both participate in that becoming. They're the foundation before you even name the hard problem."
+    },
+    {
+      "id": 2,
+      "sources": [
+        "Chalmers",
+        "Nagel",
+        "Dennett"
+      ],
+      "thread": "The Problem and the Opponent",
+      "connection": "You use Chalmers to name the hard problem, Nagel to prove why physicalism fails, and Dennett as the worthy materialist foil who sharpens your argument by resisting it."
+    },
+    {
+      "id": 3,
+      "sources": [
+        "Goff",
+        "Kastrup",
+        "Dyczkowski"
+      ],
+      "thread": "From Panpsychism to Idealism to Metaphysics",
+      "connection": "You use Goff to open panpsychism, Kastrup to show how analytic idealism avoids the Combination Problem, and Dyczkowski to ground that idealism in an actual metaphysical tradition, Kashmir Shaivism, where it crystallizes."
+    },
+    {
+      "id": 4,
+      "sources": [
+        "Bergson",
+        "Clark",
+        "Lamme"
+      ],
+      "thread": "The Brain as Permissive Filter",
+      "connection": "You use Bergson's filter theory as your launching pad. Clark's predictive processing shows the brain actively predicts the world. Lamme's re-entrant processing reveals the neural mechanism. Together they prove the brain narrows down consciousness, doesn't produce it."
+    },
+    {
+      "id": 5,
+      "sources": [
+        "James",
+        "Woollacott",
+        "Wheeler"
+      ],
+      "thread": "Transmission Not Production",
+      "connection": "You use James for the original transmission theory of the brain. Woollacott, a neuroscientist, validates that consciousness-first view. Wheeler anchors it in quantum mechanics where the observer is constitutive. Three generations, same insight."
+    },
+    {
+      "id": 6,
+      "sources": [
+        "Tononi",
+        "Lutz",
+        "Raichle"
+      ],
+      "thread": "Measuring Consciousness Empirically",
+      "connection": "You use Tononi's Phi as a quantitative handle on information integration. Lutz's gamma synchrony in meditators gives the most dramatic evidence of a consciousness-correlated metric. Raichle's Default Mode Network shows consciousness active in undirected awareness."
+    },
+    {
+      "id": 7,
+      "sources": [
+        "Damasio",
+        "Frankl",
+        "Fredrickson"
+      ],
+      "thread": "The Body Knows, Meaning Matters, Emotion Opens",
+      "connection": "You use Damasio's somatic markers to show the body feels meaning before cognition grasps it. Frankl proves meaning-making survives even extreme duress. Fredrickson shows positive emotion widens the aperture. Body, meaning, emotion become three pillars of the toolkit."
+    },
+    {
+      "id": 8,
+      "sources": [
+        "Benedetti",
+        "Kaptchuk",
+        "Clark"
+      ],
+      "thread": "How Expectation Becomes Biology",
+      "connection": "You use Benedetti's dopamine study to show expectation literally rewires neurotransmitters. Kaptchuk removes the deception objection by proving open-label placebos work. Clark's predictive processing explains why. Expectation is no longer mysterious, it's the brain's core function."
+    },
+    {
+      "id": 9,
+      "sources": [
+        "Brewer",
+        "Hölzel",
+        "Goleman"
+      ],
+      "thread": "From Altered States to Altered Traits",
+      "connection": "You use Brewer to show meditation quiets self-referential machinery neurally. Hölzel proves the brain physically changes on human timescales. Goleman and Davidson distinguish fleeting states from permanent rewiring. Practice becomes biology."
+    },
+    {
+      "id": 10,
+      "sources": [
+        "Hofstadter",
+        "Mandelbrot",
+        "Metzinger"
+      ],
+      "thread": "How Self Emerges as a Whirlpool",
+      "connection": "You use Hofstadter's self-referential loops to explain how identity arises. Mandelbrot's fractal Z equals Z squared plus C captures that self-folding mathematically. Metzinger shows the self is a constructed model. Together they build the whirlpool metaphor."
+    },
+    {
+      "id": 11,
+      "sources": [
+        "Wheeler",
+        "Schrödinger",
+        "Lambert"
+      ],
+      "thread": "The Quantum Foundation",
+      "connection": "You use Wheeler to establish the participatory principle where observation creates reality. Schrödinger's wave equation and his statement that consciousness is fundamental anchor the math and the philosophy. Lambert shows nature already solved quantum coherence in warm, wet biology."
+    },
+    {
+      "id": 12,
+      "sources": [
+        "Tegmark",
+        "Lidar",
+        "Yang"
+      ],
+      "thread": "The Decoherence Problem and Its Answers",
+      "connection": "You use Tegmark to name the sharpest objection, ten orders of magnitude too fast. Lidar's decoherence-free subspaces provide the mathematical escape hatch, your hurricane eye. Yang's hot Schrödinger cat states validate that quantum effects survive biological temperatures."
+    },
+    {
+      "id": 13,
+      "sources": [
+        "Deci",
+        "Ryan",
+        "Frankl"
+      ],
+      "thread": "What Humans Need to Flourish",
+      "connection": "You use Deci and Ryan's Self-Determination Theory to map autonomy, competence, relatedness. Frankl proves that even stripped of everything else, meaning itself sustains. Together they show the psychological architecture the book's entire practical section rests on."
+    },
+    {
+      "id": 14,
+      "sources": [
+        "Kastrup",
+        "Nagel",
+        "Goff"
+      ],
+      "thread": "Why Physicalism Fails",
+      "connection": "You use Nagel's irreducibility to show subjective experience resists reduction. Goff opens panpsychism as an alternative. Kastrup solves the Combination Problem and provides the idealist framework that actually works. Physicalism collapses, idealism stands."
+    },
+    {
+      "id": 15,
+      "sources": [
+        "Whitehead",
+        "Kastrup",
+        "Tononi"
+      ],
+      "thread": "Events, Minds, Information Integration",
+      "connection": "You use Whitehead's process philosophy to say reality is events. Kastrup shows how consciousness as ideation unifies those events. Tononi gives you Phi as the metric of that unification. Philosophy finds its empirical handle."
+    },
+    {
+      "id": 16,
+      "sources": [
+        "Bergson",
+        "James",
+        "Metzinger"
+      ],
+      "thread": "How the Brain Localizes Consciousness",
+      "connection": "You use Bergson and James to establish that consciousness is cosmic and the brain filters it. Metzinger shows the self is a model that focuses consciousness into a localized point. The prism mechanism gets its final mechanism."
+    },
+    {
+      "id": 17,
+      "sources": [
+        "Raichle",
+        "Brewer",
+        "Metzinger"
+      ],
+      "thread": "The Self-Referential Machine",
+      "connection": "You use Raichle's Default Mode Network as the brain's self-referential baseline. Brewer shows meditators quiet it, accessing boundless awareness. Metzinger explains why it's a constructed model. Unburdening the self becomes neurologically legible."
+    },
+    {
+      "id": 18,
+      "sources": [
+        "Clark",
+        "Damasio",
+        "Fredrickson"
+      ],
+      "thread": "Prediction, Body Markers, and Emotional Scope",
+      "connection": "You use Clark to show the brain predicts reality. Damasio shows the body marks which predictions matter via somatic signals. Fredrickson shows emotion widens what the brain attends to. The brain becomes a meaning-seeking prediction machine."
+    },
+    {
+      "id": 19,
+      "sources": [
+        "Frankl",
+        "Deci",
+        "Benedetti"
+      ],
+      "thread": "Meaning Rewires Biology",
+      "connection": "You use Frankl to show meaning's power under extremity. Deci and Ryan map the psychological structure meaning requires. Benedetti proves meaning literally becomes dopamine. Intentionality cascades down to neurotransmitters."
+    },
+    {
+      "id": 20,
+      "sources": [
+        "Wheeler",
+        "Feynman",
+        "Lambert"
+      ],
+      "thread": "Quantum Weirdness to Biological Reality",
+      "connection": "You use Feynman to anchor the double-slit strangeness. Wheeler explains why observation brings reality into being. Lambert shows that weirdness isn't confined to labs, nature uses it in photosynthesis and bird navigation. Quantum is biological."
+    },
+    {
+      "id": 21,
+      "sources": [
+        "Hölzel",
+        "Goleman",
+        "Brewer"
+      ],
+      "thread": "Neural Plasticity From Practice",
+      "connection": "You use Hölzel to prove gray matter changes from eight weeks of practice. Goleman and Davidson show those changes become permanent, altering baseline traits. Brewer reveals the mechanism by quieting self-referential loops. Practice literally rewires who you are."
+    },
+    {
+      "id": 22,
+      "sources": [
+        "Dyczkowski",
+        "Kastrup",
+        "Whitehead"
+      ],
+      "thread": "The Metaphysics Crystallizes Across Traditions",
+      "connection": "You use Dyczkowski to show the doctrine of vibration in Kashmir Shaivism. Kastrup translates that into analytic idealism. Whitehead's process philosophy echoes the same structure. Ancient tradition, modern philosophy, process metaphysics converge."
+    },
+    {
+      "id": 23,
+      "sources": [
+        "Nagel",
+        "Lamme",
+        "Lutz"
+      ],
+      "thread": "Subjective Experience and Its Neural Correlates",
+      "connection": "You use Nagel to say subjective experience is irreducible. Lamme finds re-entrant processing correlates with consciousness. Lutz measures it at thirty times baseline in meditators. Irreducibility and correlation coexist without contradiction."
+    },
+    {
+      "id": 24,
+      "sources": [
+        "Arendt",
+        "Fredrickson",
+        "Deci"
+      ],
+      "thread": "How We Move Together",
+      "connection": "You use Arendt's Human Condition to philosophize collective action and the fleet metaphor. Fredrickson shows positive emotion expands social capacity. Deci and Ryan show relatedness is a fundamental psychological need. Community becomes both necessary and natural."
+    },
+    {
+      "id": 25,
+      "sources": [
+        "Van der Kolk",
+        "Damasio",
+        "Hölzel"
+      ],
+      "thread": "The Body's Embodied Memory",
+      "connection": "You use Van der Kolk to show the body holds trauma and memory. Damasio's somatic markers explain the mechanism. Hölzel's mindfulness studies show how practice allows the body to release what it's held. Embodied healing becomes neurobiological."
+    },
+    {
+      "id": 26,
+      "sources": [
+        "Schrödinger",
+        "Wheeler",
+        "Mandelbrot"
+      ],
+      "thread": "Consciousness in the Math",
+      "connection": "You use Schrödinger's wave equation and his statement that consciousness is fundamental. Wheeler shows how observation collapses possibility into actuality. Mandelbrot's fractals capture the self-referential signature. Consciousness and mathematics become the same language."
+    },
+    {
+      "id": 27,
+      "sources": [
+        "James",
+        "Kastrup",
+        "Tononi"
+      ],
+      "thread": "From Transmission to Ideation to Integration",
+      "connection": "You use James to establish the brain transmits consciousness. Kastrup shows consciousness is ideation, the universe thinking through forms. Tononi's Phi measures how integrated that thinking becomes. Three layers of one model."
+    },
+    {
+      "id": 28,
+      "sources": [
+        "Bergson",
+        "Woollacott",
+        "Clark"
+      ],
+      "thread": "The Filter Refined Into Prediction",
+      "connection": "You use Bergson's filter theory as the starting metaphor. Woollacott validates it neurologically. Clark shows how that filter is actually prediction machinery. The metaphor becomes a mechanism."
+    },
+    {
+      "id": 29,
+      "sources": [
+        "Benedetti",
+        "Goleman",
+        "Frankl"
+      ],
+      "thread": "Expectation Rewires, Practice Sticks, Meaning Endures",
+      "connection": "You use Benedetti to show expectation becomes dopamine. Goleman and Davidson prove practice alters baseline traits permanently. Frankl demonstrates that meaning survives everything. Together they say intentionality has biological staying power."
+    },
+    {
+      "id": 30,
+      "sources": [
+        "Hofstadter",
+        "Metzinger",
+        "Raichle"
+      ],
+      "thread": "Self as Localized Loop",
+      "connection": "You use Hofstadter's self-referential feedback to explain identity. Metzinger shows that feedback is the brain's constructed self-model. Raichle's Default Mode Network is where that construction happens. The whirlpool has neural address."
+    }
   ]
 };
 
-        // --- Icon Components ---
-        const BookIcon = ({ darkMode }) => <svg className={`w-6 h-6 ${darkMode ? 'text-teal-400' : 'text-[#2E4057]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>;
-        const ChevronLeftIcon = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>;
-        const ChevronRightIcon = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>;
-        const CheckIcon = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>;
-        const RefreshIcon = ({ darkMode }) => <svg className={`w-5 h-5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>;
-        const ShuffleIcon = ({ darkMode }) => <svg className={`w-5 h-5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4h4l3 9 3-9h4M4 20h4l3-9m6 9h4" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 4l2 2-2 2M19 18l2 2-2 2" /></svg>;
-        const SunIcon = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>;
-        const MoonIcon = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>;
+        const getTodayStr = () => new Date().toISOString().split('T')[0];
+        const truncate = (text, wordLimit = 20) => {
+            if (!text) return '';
+            const firstSentence = text.split(/\.\s/)[0];
+            const words = firstSentence.split(/\s+/);
+            if (words.length <= wordLimit) return firstSentence + (firstSentence.endsWith('.') ? '' : '.');
+            return words.slice(0, wordLimit).join(' ') + '\u2026';
+        };
+        const shuffleArr = (arr) => {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+            return a;
+        };
+
+        // --- Icons ---
+        const BookIcon = ({dm}) => <svg className={`w-6 h-6 ${dm?'text-teal-400':'text-[#2E4057]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>;
+        const ChevLeft = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>;
+        const ChevRight = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>;
+        const CheckIcon = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>;
+        const RefreshIcon = ({dm}) => <svg className={`w-5 h-5 ${dm?'text-gray-300':'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>;
+        const ShuffleIcon = ({dm}) => <svg className={`w-5 h-5 ${dm?'text-gray-300':'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4h4l3 9 3-9h4M4 20h4l3-9m6 9h4"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 4l2 2-2 2M19 18l2 2-2 2"/></svg>;
+        const SunIcon = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>;
+        const MoonIcon = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>;
         const FireIcon = () => <svg className="w-4 h-4 text-orange-500 streak-fire" viewBox="0 0 24 24" fill="currentColor"><path d="M12 23c-3.866 0-7-3.134-7-7 0-3.037 1.968-5.627 3.5-7.5.413-.505 1.5-.2 1.5.5 0 1.382.864 2.498 2 2.997V11c0-3.866 2.134-8 5-11 .403-.422 1-.098 1 .5 0 3.866 2 7 2 10.5 0 5.523-3.134 9-8 9v3z"/></svg>;
-        const ChartIcon = ({ darkMode }) => <svg className={`w-5 h-5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>;
-        const UndoIcon = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a5 5 0 015 5v2M3 10l4-4m-4 4l4 4" /></svg>;
+        const ChartIcon = ({dm}) => <svg className={`w-5 h-5 ${dm?'text-gray-300':'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>;
+        const UndoIcon = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a5 5 0 015 5v2M3 10l4-4m-4 4l4 4"/></svg>;
+        const ChevDown = ({open, dm}) => <svg className={`w-4 h-4 transition-transform duration-300 ${open?'rotate-180':''} ${dm?'text-teal-400':'text-[#2E4057]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/></svg>;
 
-        // --- Score Dots Component ---
-        const ScoreDots = ({ score, maxScore = 10, darkMode }) => {
-            return (
-                <div className="flex gap-1 items-center">
-                    {Array.from({ length: maxScore }, (_, i) => (
-                        <span
-                            key={i}
-                            className="score-dot"
-                            style={{
-                                backgroundColor: i < score
-                                    ? (darkMode ? '#5EEAD4' : '#2E4057')
-                                    : (darkMode ? '#374151' : '#D1D5DB')
-                            }}
-                        />
-                    ))}
-                </div>
-            );
+        const ScoreDots = ({score, dm}) => (<div className="flex gap-0.5 items-center">{Array.from({length:10},(_,i)=><span key={i} className="score-dot" style={{backgroundColor:i<score?(dm?'#5EEAD4':'#2E4057'):(dm?'#374151':'#D1D5DB')}}/>)}</div>);
+
+        const CircularProgress = ({progress, size=44, strokeWidth=4, dm}) => {
+            const r=(size-strokeWidth)/2, c=r*2*Math.PI, o=c-(progress/100)*c;
+            return (<svg width={size} height={size} className="circular-progress"><circle cx={size/2} cy={size/2} r={r} fill="none" stroke={dm?'#374151':'#E5E7EB'} strokeWidth={strokeWidth}/><circle cx={size/2} cy={size/2} r={r} fill="none" stroke={progress>=100?'#10B981':'#2E4057'} strokeWidth={strokeWidth} strokeDasharray={c} strokeDashoffset={o} strokeLinecap="round"/><text x="50%" y="50%" textAnchor="middle" dy=".3em" className={`text-xs font-bold ${dm?'fill-gray-200':'fill-gray-700'}`} style={{transform:'rotate(90deg)',transformOrigin:'center'}}>{Math.round(progress)}%</text></svg>);
         };
 
-        // --- Circular Progress Component ---
-        const CircularProgress = ({ progress, size = 48, strokeWidth = 4, darkMode }) => {
-            const radius = (size - strokeWidth) / 2;
-            const circumference = radius * 2 * Math.PI;
-            const offset = circumference - (progress / 100) * circumference;
-            return (
-                <svg width={size} height={size} className="circular-progress">
-                    <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={darkMode ? '#374151' : '#E5E7EB'} strokeWidth={strokeWidth} />
-                    <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={progress >= 100 ? '#10B981' : '#2E4057'} strokeWidth={strokeWidth} strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" />
-                    <text x="50%" y="50%" textAnchor="middle" dy=".3em" className={`text-xs font-bold ${darkMode ? 'fill-gray-200' : 'fill-gray-700'}`} style={{ transform: 'rotate(90deg)', transformOrigin: 'center' }}>
-                        {Math.round(progress)}%
-                    </text>
-                </svg>
-            );
-        };
-
-        // --- Undo Toast Component ---
-        const UndoToast = ({ show, onUndo, onDismiss, darkMode, cardName }) => {
+        const UndoToast = ({show, onUndo, dm}) => {
             if (!show) return null;
-            return (
-                <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50 toast-enter">
-                    <div className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg ${darkMode ? 'bg-gray-800 text-white' : 'bg-gray-900 text-white'}`}>
-                        <span className="text-sm">Marked as known</span>
-                        <button onClick={onUndo} className="flex items-center gap-1 px-2 py-1 bg-[#2E4057] hover:bg-[#3a5270] rounded text-sm font-medium btn-bounce">
-                            <UndoIcon /> Undo
-                        </button>
-                    </div>
-                </div>
-            );
+            return (<div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50 toast-enter"><div className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg ${dm?'bg-gray-800 text-white':'bg-gray-900 text-white'}`}><span className="text-sm">Marked as known</span><button onClick={onUndo} className="flex items-center gap-1 px-2 py-1 bg-[#2E4057] hover:bg-[#3a5270] rounded text-sm font-medium btn-bounce"><UndoIcon/> Undo</button></div></div>);
         };
 
-        // --- Stats Modal Component ---
-        const StatsModal = ({ show, onClose, stats, darkMode }) => {
+        const StatsModal = ({show, onClose, stats, dm}) => {
             if (!show) return null;
-            return (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onClose}>
-                    <div className={`w-full max-w-sm rounded-xl p-6 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-2xl`} onClick={e => e.stopPropagation()}>
-                        <h3 className={`text-lg font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Your Statistics</h3>
-                        <div className="space-y-4">
-                            <div className={`flex justify-between items-center p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                                <span className={darkMode ? 'text-gray-300' : 'text-gray-600'}>Today's cards</span>
-                                <span className={`font-bold text-lg ${darkMode ? 'text-white' : 'text-gray-800'}`}>{stats.todayCards}</span>
-                            </div>
-                            <div className={`flex justify-between items-center p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                                <span className={darkMode ? 'text-gray-300' : 'text-gray-600'}>Total mastered</span>
-                                <span className={`font-bold text-lg ${darkMode ? 'text-white' : 'text-gray-800'}`}>{stats.totalMastered}</span>
-                            </div>
-                            <div className={`flex justify-between items-center p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                                <span className={darkMode ? 'text-gray-300' : 'text-gray-600'}>Current streak</span>
-                                <span className="font-bold text-lg text-orange-500 flex items-center gap-1">
-                                    <FireIcon /> {stats.streak} days
-                                </span>
-                            </div>
-                            <div className={`flex justify-between items-center p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                                <span className={darkMode ? 'text-gray-300' : 'text-gray-600'}>Best streak</span>
-                                <span className={`font-bold text-lg ${darkMode ? 'text-white' : 'text-gray-800'}`}>{stats.bestStreak} days</span>
-                            </div>
-                            <div className={`flex justify-between items-center p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                                <span className={darkMode ? 'text-gray-300' : 'text-gray-600'}>Top 36 mastered</span>
-                                <span className={`font-bold text-lg ${darkMode ? 'text-white' : 'text-gray-800'}`}>{stats.topMastered}/36</span>
-                            </div>
-                        </div>
-                        <button onClick={onClose} className={`mt-6 w-full py-2 rounded-lg font-medium btn-bounce ${darkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}>
-                            Close
-                        </button>
-                    </div>
+            return (<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onClose}><div className={`w-full max-w-sm rounded-xl p-6 ${dm?'bg-gray-800':'bg-white'} shadow-2xl`} onClick={e=>e.stopPropagation()}>
+                <h3 className={`text-lg font-bold mb-4 ${dm?'text-white':'text-gray-800'}`}>Your Statistics</h3>
+                <div className="space-y-3">
+                    {[["Today's cards",stats.todayCards],['Sources mastered',stats.totalMastered+'/153'],['Connections mastered',stats.connMastered+'/'+DATA.connectionCards.length]].map(([l,v],i)=>
+                        <div key={i} className={`flex justify-between items-center p-3 rounded-lg ${dm?'bg-gray-700':'bg-gray-100'}`}><span className={dm?'text-gray-300':'text-gray-600'}>{l}</span><span className={`font-bold text-lg ${dm?'text-white':'text-gray-800'}`}>{v}</span></div>
+                    )}
+                    <div className={`flex justify-between items-center p-3 rounded-lg ${dm?'bg-gray-700':'bg-gray-100'}`}><span className={dm?'text-gray-300':'text-gray-600'}>Current streak</span><span className="font-bold text-lg text-orange-500 flex items-center gap-1"><FireIcon/> {stats.streak} days</span></div>
+                    <div className={`flex justify-between items-center p-3 rounded-lg ${dm?'bg-gray-700':'bg-gray-100'}`}><span className={dm?'text-gray-300':'text-gray-600'}>Best streak</span><span className={`font-bold text-lg ${dm?'text-white':'text-gray-800'}`}>{stats.bestStreak} days</span></div>
                 </div>
-            );
+                <button onClick={onClose} className={`mt-6 w-full py-2 rounded-lg font-medium btn-bounce ${dm?'bg-gray-700 text-white hover:bg-gray-600':'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}>Close</button>
+            </div></div>);
         };
 
-        // --- Flashcard Component ---
-        const Flashcard = ({ card, isFlipped, mode, darkMode }) => {
-            if (!card) {
-                return (
-                    <div className={`absolute inset-0 w-full h-full min-h-[380px] rounded-xl card-shadow border-2 flex flex-col items-center justify-center p-4 text-center ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                        <div className={`text-lg font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>You've mastered all cards in this set!</div>
-                        <div className={`text-sm mt-2 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>Change filters or press Reset to study again.</div>
-                    </div>
-                );
-            }
+        // ===== SOURCE CARD with Three-Tier Back =====
+        const SourceCard = ({card, isFlipped, mode, dm}) => {
+            const [showMore, setShowMore] = useState(false);
+            useEffect(() => { setShowMore(false); }, [card?.rank]);
+
+            if (!card) return (<div className={`absolute inset-0 w-full h-full min-h-[400px] rounded-xl card-shadow border-2 flex flex-col items-center justify-center p-4 text-center ${dm?'bg-gray-800 border-gray-700':'bg-white border-gray-200'}`}><div className={`text-lg font-medium ${dm?'text-gray-300':'text-gray-600'}`}>You've mastered all cards in this set!</div><div className={`text-sm mt-2 ${dm?'text-gray-500':'text-gray-500'}`}>Change filters or press Reset to study again.</div></div>);
 
             const isTop = card.tier === 'top';
+            const front = (<div className={`absolute inset-0 w-full h-full rounded-xl card-shadow border-2 backface-hidden flex flex-col items-center justify-center p-6 ${dm?'bg-gray-800 border-gray-700':'bg-white border-gray-200'}`}>
+                <span className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-bold ${isTop?(dm?'bg-amber-900/50 text-amber-300':'bg-amber-100 text-amber-700'):(dm?'bg-gray-700 text-gray-400':'bg-gray-100 text-gray-500')}`}>#{card.rank}</span>
+                {isTop && <span className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-medium badge-pulse ${dm?'bg-amber-900/50 text-amber-300':'bg-amber-100 text-amber-700'}`}>Top 36</span>}
+                {mode==='quiz' ? <div className={`font-bold text-center text-2xl sm:text-3xl mb-3 ${dm?'text-gray-100':'text-gray-800'}`}>{card.author}</div>
+                : <><div className={`font-bold text-center text-2xl sm:text-3xl mb-2 ${dm?'text-gray-100':'text-gray-800'}`}>{card.author}</div><div className={`text-center text-sm sm:text-base mb-4 ${dm?'text-gray-400':'text-gray-500'}`}>{card.shortTitle}</div></>}
+                <div className="mb-3"><ScoreDots score={card.score} dm={dm}/></div>
+                <div className="flex gap-1.5 flex-wrap justify-center mb-2">{card.chapters.split(',').map(ch=><span key={ch.trim()} className={`px-2 py-0.5 rounded-full text-xs ${dm?'bg-gray-700 text-gray-300':'bg-gray-100 text-gray-500'}`}>Ch. {ch.trim()}</span>)}</div>
+                <div className={`absolute bottom-4 text-xs ${dm?'text-gray-500':'text-gray-400'}`}>{mode==='quiz'?'Recall the key argument, then flip':'Tap or swipe \u00b7 Space to flip'}</div>
+            </div>);
 
-            // Front of card
-            const frontContent = (
-                <div className={`absolute inset-0 w-full h-full rounded-xl card-shadow border-2 backface-hidden flex flex-col items-center justify-center p-6 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                    {/* Rank badge */}
-                    <span className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-bold ${isTop ? (darkMode ? 'bg-amber-900/50 text-amber-300' : 'bg-amber-100 text-amber-700') : (darkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-500')}`}>
-                        #{card.rank}
-                    </span>
-                    {/* Tier badge */}
-                    {isTop && (
-                        <span className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-medium badge-pulse ${darkMode ? 'bg-amber-900/50 text-amber-300' : 'bg-amber-100 text-amber-700'}`}>
-                            Top 36
-                        </span>
-                    )}
-                    {/* Author name */}
-                    {mode === 'quiz' ? (
-                        <div className={`font-bold text-center text-2xl sm:text-3xl mb-3 ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
-                            {card.author}
-                        </div>
-                    ) : (
-                        <>
-                            <div className={`font-bold text-center text-2xl sm:text-3xl mb-2 ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
-                                {card.author}
-                            </div>
-                            <div className={`text-center text-sm sm:text-base mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                {card.shortTitle}
-                            </div>
-                        </>
-                    )}
-                    {/* Score dots */}
-                    <div className="mb-3">
-                        <ScoreDots score={card.score} darkMode={darkMode} />
+            const back = (<div className={`absolute inset-0 w-full h-full rounded-xl card-shadow border-2 backface-hidden rotate-y-180 flex flex-col ${isTop?(dm?'bg-[#1a2f3f] border-teal-800':'bg-teal-50 border-teal-200'):(dm?'bg-gray-800 border-gray-700':'bg-slate-50 border-slate-200')}`}>
+                <div className="card-back-content p-5 pr-3 flex-1" onClick={e=>e.stopPropagation()}>
+                    {/* TIER 1: One-Liner */}
+                    <div className={`text-base sm:text-lg font-semibold leading-snug mb-4 ${dm?'text-gray-100':'text-gray-800'}`}>
+                        {isTop ? (card.oneLiner || card.whyItMatters) : card.whyItMatters}
                     </div>
-                    {/* Chapters */}
-                    <div className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                        Ch. {card.chapters}
-                    </div>
-                    {mode === 'quiz' && (
-                        <div className={`absolute bottom-4 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                            Can you recall the key argument?
-                        </div>
-                    )}
-                    {mode !== 'quiz' && (
-                        <div className={`absolute bottom-4 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                            Tap or swipe &middot; Space to flip
-                        </div>
-                    )}
-                </div>
-            );
-
-            // Back of card
-            const backContent = (
-                <div className={`absolute inset-0 w-full h-full rounded-xl card-shadow border-2 backface-hidden rotate-y-180 flex flex-col p-5 ${isTop ? (darkMode ? 'bg-[#1a2f3f] border-teal-800' : 'bg-teal-50 border-teal-200') : (darkMode ? 'bg-gray-800 border-gray-700' : 'bg-slate-50 border-slate-200')}`}>
-                    <div className="card-back-content pr-1">
-                        {isTop ? (
-                            <>
-                                <div className="mb-3">
-                                    <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${darkMode ? 'text-teal-400' : 'text-[#2E4057]'}`}>Argues</div>
-                                    <div className={`text-xs leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{card.argues}</div>
-                                </div>
-                                <div className="mb-3">
-                                    <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${darkMode ? 'text-teal-400' : 'text-[#2E4057]'}`}>Connects to Your Book</div>
-                                    <div className={`text-xs leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{card.connects}</div>
-                                </div>
-                                <div className="mb-3">
-                                    <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${darkMode ? 'text-teal-400' : 'text-[#2E4057]'}`}>Where You Depart</div>
-                                    <div className={`text-xs leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{card.departs}</div>
-                                </div>
-                                <div className="mb-3">
-                                    <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${darkMode ? 'text-amber-400' : 'text-amber-700'}`}>Likely Objection</div>
-                                    <div className={`text-xs leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{card.objection}</div>
-                                </div>
-                                <div className="mb-3">
-                                    <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${darkMode ? 'text-teal-400' : 'text-[#2E4057]'}`}>Key Details</div>
-                                    <div className={`text-xs leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{card.keyDetails}</div>
-                                </div>
-                                <div className="mb-1">
-                                    <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${darkMode ? 'text-teal-400' : 'text-[#2E4057]'}`}>Suggested Reading</div>
-                                    <div className={`text-xs leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{card.suggestedReading}</div>
-                                </div>
-                            </>
-                        ) : (
-                            <div className="flex flex-col items-center justify-center h-full min-h-[280px]">
-                                <div className={`text-xs font-bold uppercase tracking-wide mb-3 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Why It Matters</div>
-                                <div className={`text-sm leading-relaxed text-center ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>{card.whyItMatters}</div>
-                            </div>
-                        )}
-                    </div>
-                    <div className={`text-xs text-center mt-auto pt-2 ${darkMode ? 'text-teal-500' : 'text-teal-600'}`}>
-                        Tap or swipe &middot; Enter to mark known
-                    </div>
-                </div>
-            );
-
-            return (
-                <div className={`absolute inset-0 w-full h-full transition-transform duration-500 transform-style-preserve-3d card-flip-container ${isFlipped ? 'rotate-y-180' : ''}`}>
-                    {frontContent}
-                    {backContent}
-                </div>
-            );
-        };
-
-        // --- Deck Controls ---
-        const DeckControls = ({ handlers, state, darkMode }) => (
-            <div className="flex justify-between items-center mb-6 mt-4">
-                <button onClick={handlers.handlePrevious} disabled={state.deckSize < 2 || state.isAnimating} className={`flex items-center gap-2 px-4 py-2 rounded-lg shadow-sm border disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm btn-bounce ${darkMode ? 'bg-gray-800 border-gray-700 text-gray-200 hover:bg-gray-700' : 'bg-white hover:bg-gray-50'}`}><ChevronLeftIcon />Prev</button>
-                <div className="flex items-center gap-2">
-                    <button onClick={handlers.resetDeckProgress} disabled={state.totalPotentialCards === 0} className={`p-2 rounded-lg shadow-sm border transition-colors disabled:opacity-50 disabled:cursor-not-allowed btn-bounce ${darkMode ? 'bg-gray-800 border-gray-700 hover:bg-gray-700' : 'bg-white hover:bg-gray-50'}`} title="Reset Progress"><RefreshIcon darkMode={darkMode} /></button>
-                    <button onClick={handlers.handleToggleRemembered} disabled={!state.isCardPresent || state.isAnimating} className={`p-2 rounded-lg shadow-sm border transition-colors disabled:opacity-50 disabled:cursor-not-allowed btn-bounce ${state.isRemembered ? 'bg-green-500 text-white border-green-600 hover:bg-green-600' : darkMode ? 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-50'}`} title={state.isRemembered ? "Mark as not known" : "Got It (Enter)"}><CheckIcon /></button>
-                </div>
-                <button onClick={handlers.handleNext} disabled={state.deckSize < 2 || state.isAnimating} className="flex items-center gap-2 px-4 py-2 bg-[#2E4057] text-white rounded-lg shadow-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#3a5270] transition-colors text-sm btn-bounce">Next<ChevronRightIcon /></button>
-            </div>
-        );
-
-        // --- Helper ---
-        const getTodayStr = () => new Date().toISOString().split('T')[0];
-
-        // --- Main App ---
-        const CitationFlashcards = () => {
-            const [currentIndex, setCurrentIndex] = useState(0);
-            const [isFlipped, setIsFlipped] = useState(false);
-            const [mode, setMode] = useState(() => {
-                try { const s = localStorage.getItem('citationMode'); return s ? JSON.parse(s) : 'study'; } catch { return 'study'; }
-            });
-            const [activeCategory, setActiveCategory] = useState(() => {
-                try { const s = localStorage.getItem('citationActiveCategory'); return s ? JSON.parse(s) : 'all'; } catch { return 'all'; }
-            });
-            const [tierFilter, setTierFilter] = useState(() => {
-                try { const s = localStorage.getItem('citationTierFilter'); return s ? JSON.parse(s) : 'all'; } catch { return 'all'; }
-            });
-            const [chapterFilter, setChapterFilter] = useState(() => {
-                try { const s = localStorage.getItem('citationChapterFilter'); return s ? JSON.parse(s) : ''; } catch { return ''; }
-            });
-            const [shuffledCards, setShuffledCards] = useState([]);
-            const interactionRef = useRef({});
-            const [isAnimating, setIsAnimating] = useState(false);
-            const FLIP_ANIMATION_DURATION = 500;
-
-            const [darkMode, setDarkMode] = useState(() => {
-                try { const s = localStorage.getItem('citationDarkMode'); return s ? JSON.parse(s) : window.matchMedia('(prefers-color-scheme: dark)').matches; } catch { return false; }
-            });
-            const [showStats, setShowStats] = useState(false);
-            const [undoState, setUndoState] = useState({ show: false, card: null, timeout: null });
-
-            const [streakData, setStreakData] = useState(() => {
-                try {
-                    const saved = localStorage.getItem('citationStreak');
-                    if (saved) {
-                        const data = JSON.parse(saved);
-                        const today = getTodayStr();
-                        const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-                        if (data.lastDate === today) return data;
-                        else if (data.lastDate === yesterday) return { ...data, todayCards: 0 };
-                        else return { streak: 0, bestStreak: data.bestStreak || 0, lastDate: null, todayCards: 0 };
-                    }
-                    return { streak: 0, bestStreak: 0, lastDate: null, todayCards: 0 };
-                } catch { return { streak: 0, bestStreak: 0, lastDate: null, todayCards: 0 }; }
-            });
-
-            const [rememberedCards, setRememberedCards] = useState(() => {
-                try { const s = localStorage.getItem('citationRemembered'); return s ? new Set(JSON.parse(s)) : new Set(); } catch { return new Set(); }
-            });
-
-            // Persist state
-            useEffect(() => { try { localStorage.setItem('citationDarkMode', JSON.stringify(darkMode)); } catch {} }, [darkMode]);
-            useEffect(() => { try { localStorage.setItem('citationMode', JSON.stringify(mode)); } catch {} }, [mode]);
-            useEffect(() => { try { localStorage.setItem('citationActiveCategory', JSON.stringify(activeCategory)); } catch {} }, [activeCategory]);
-            useEffect(() => { try { localStorage.setItem('citationTierFilter', JSON.stringify(tierFilter)); } catch {} }, [tierFilter]);
-            useEffect(() => { try { localStorage.setItem('citationChapterFilter', JSON.stringify(chapterFilter)); } catch {} }, [chapterFilter]);
-            useEffect(() => { try { localStorage.setItem('citationStreak', JSON.stringify(streakData)); } catch {} }, [streakData]);
-            useEffect(() => {
-                const handler = setTimeout(() => {
-                    try { localStorage.setItem('citationRemembered', JSON.stringify(Array.from(rememberedCards))); } catch {}
-                }, 500);
-                return () => clearTimeout(handler);
-            }, [rememberedCards]);
-
-            // Get all chapters for filter
-            const allChapters = useMemo(() => {
-                const chSet = new Set();
-                CITATION_DATA.sources.forEach(s => {
-                    s.chapters.split(',').map(c => c.trim()).forEach(c => { if (c) chSet.add(c); });
-                });
-                return Array.from(chSet).sort((a, b) => parseInt(a) - parseInt(b));
-            }, []);
-
-            // Category names
-            const categoryNames = Object.keys(CITATION_DATA.categories);
-
-            // Filter sources
-            const filteredSources = useMemo(() => {
-                let sources = CITATION_DATA.sources;
-
-                // Category filter
-                if (activeCategory !== 'all') {
-                    const rankIds = CITATION_DATA.categories[activeCategory] || [];
-                    const rankSet = new Set(rankIds);
-                    sources = sources.filter(s => rankSet.has(s.rank));
-                }
-
-                // Tier filter
-                if (tierFilter === 'top') {
-                    sources = sources.filter(s => s.tier === 'top');
-                }
-
-                // Chapter filter
-                if (chapterFilter) {
-                    sources = sources.filter(s => {
-                        const chs = s.chapters.split(',').map(c => c.trim());
-                        return chs.includes(chapterFilter);
-                    });
-                }
-
-                // Sort by rank
-                return sources.sort((a, b) => a.rank - b.rank);
-            }, [activeCategory, tierFilter, chapterFilter]);
-
-            const totalPotentialCards = filteredSources;
-
-            const shuffle = (array) => {
-                const newArray = [...array];
-                for (let i = newArray.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-                }
-                return newArray;
-            };
-
-            useEffect(() => {
-                const cardsToStudy = filteredSources.filter(s => !rememberedCards.has(s.rank));
-                setShuffledCards(cardsToStudy);
-                setCurrentIndex(0);
-                setIsFlipped(false);
-            }, [filteredSources]);
-
-            const handleShuffle = () => {
-                setShuffledCards(prev => shuffle([...prev]));
-                setCurrentIndex(0);
-                setIsFlipped(false);
-            };
-
-            const navigate = useCallback((direction) => {
-                if (isAnimating || shuffledCards.length === 0) return;
-                const changeCard = () => {
-                    setCurrentIndex(i => {
-                        if (direction === 'next') return (i + 1) % shuffledCards.length;
-                        return (i - 1 + shuffledCards.length) % shuffledCards.length;
-                    });
-                };
-                if (isFlipped) {
-                    setIsAnimating(true);
-                    setIsFlipped(false);
-                    setTimeout(() => { changeCard(); setIsAnimating(false); }, FLIP_ANIMATION_DURATION);
-                } else {
-                    changeCard();
-                }
-            }, [isFlipped, isAnimating, shuffledCards.length]);
-
-            const handleNext = () => navigate('next');
-            const handlePrevious = () => navigate('previous');
-            const handleFlip = () => { if (shuffledCards.length > 0) setIsFlipped(f => !f); };
-
-            const handleUndo = useCallback(() => {
-                if (!undoState.card) return;
-                const cardToRestore = undoState.card;
-                if (undoState.timeout) clearTimeout(undoState.timeout);
-                setUndoState({ show: false, card: null, timeout: null });
-                setRememberedCards(prev => { const n = new Set(prev); n.delete(cardToRestore.rank); return n; });
-                setShuffledCards(prevCards => [...prevCards, cardToRestore]);
-                setStreakData(prev => ({ ...prev, todayCards: Math.max(0, prev.todayCards - 1) }));
-            }, [undoState]);
-
-            const handleToggleRemembered = () => {
-                const currentCard = shuffledCards[currentIndex];
-                if (!currentCard || isAnimating) return;
-                const isAlreadyRemembered = rememberedCards.has(currentCard.rank);
-
-                const performUpdate = () => {
-                    setRememberedCards(prev => {
-                        const n = new Set(prev);
-                        if (isAlreadyRemembered) n.delete(currentCard.rank);
-                        else n.add(currentCard.rank);
-                        return n;
-                    });
-                    if (!isAlreadyRemembered) {
-                        setStreakData(prev => {
-                            const today = getTodayStr();
-                            const newTodayCards = prev.todayCards + 1;
-                            let newStreak = prev.streak;
-                            if (prev.lastDate !== today) newStreak = prev.streak + 1;
-                            return { streak: newStreak, bestStreak: Math.max(prev.bestStreak, newStreak), lastDate: today, todayCards: newTodayCards };
-                        });
-                        setShuffledCards(prevCards => {
-                            const newCards = prevCards.filter(c => c.rank !== currentCard.rank);
-                            setCurrentIndex(prevIndex => Math.min(prevIndex, newCards.length > 0 ? newCards.length - 1 : 0));
-                            return newCards;
-                        });
-                        if (undoState.timeout) clearTimeout(undoState.timeout);
-                        const timeout = setTimeout(() => { setUndoState({ show: false, card: null, timeout: null }); }, 5000);
-                        setUndoState({ show: true, card: currentCard, timeout });
-                    }
-                };
-
-                if (isFlipped && !isAlreadyRemembered) {
-                    setIsAnimating(true);
-                    setIsFlipped(false);
-                    setTimeout(() => { performUpdate(); setIsAnimating(false); }, FLIP_ANIMATION_DURATION);
-                } else {
-                    setIsFlipped(false);
-                    performUpdate();
-                }
-            };
-
-            const resetDeckProgress = () => {
-                const ranksInView = totalPotentialCards.map(c => c.rank);
-                setRememberedCards(prev => {
-                    const n = new Set(prev);
-                    ranksInView.forEach(id => n.delete(id));
-                    return n;
-                });
-                setShuffledCards([...filteredSources]);
-                setCurrentIndex(0);
-                setIsFlipped(false);
-            };
-
-            // Pointer / touch handling
-            const pointerActiveRef = useRef(false);
-            const handlePointerDown = (e) => {
-                if (shuffledCards.length === 0 || isAnimating) return;
-                pointerActiveRef.current = true;
-                interactionRef.current = { startX: e.clientX, startY: e.clientY, startTime: Date.now(), isSwiping: false };
-                try { e.target.setPointerCapture(e.pointerId); } catch {}
-            };
-            const handlePointerMove = (e) => {
-                if (!interactionRef.current.startX) return;
-                const dX = Math.abs(e.clientX - interactionRef.current.startX);
-                const dY = Math.abs(e.clientY - interactionRef.current.startY);
-                if (dX > 10 || dY > 10) interactionRef.current.isSwiping = true;
-            };
-            const handlePointerUp = (e) => {
-                if (!interactionRef.current.startX) return;
-                const { startX, isSwiping } = interactionRef.current;
-                const distance = e.clientX - startX;
-                if (isSwiping && Math.abs(distance) > 50) {
-                    if (distance < 0) handleNext(); else handlePrevious();
-                } else { handleFlip(); }
-                try { e.target.releasePointerCapture(e.pointerId); } catch {}
-                interactionRef.current = {};
-            };
-            const handleCardClick = (e) => {
-                if (pointerActiveRef.current) return;
-                if (shuffledCards.length === 0 || isAnimating) return;
-                handleFlip();
-            };
-
-            // Keyboard shortcuts
-            useEffect(() => {
-                const handleKeyDown = (e) => {
-                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
-                    switch (e.key) {
-                        case 'ArrowLeft': e.preventDefault(); handlePrevious(); break;
-                        case 'ArrowRight': e.preventDefault(); handleNext(); break;
-                        case ' ': e.preventDefault(); handleFlip(); break;
-                        case 'Enter': e.preventDefault(); handleToggleRemembered(); break;
-                        case 'z': if ((e.ctrlKey || e.metaKey) && undoState.show) { e.preventDefault(); handleUndo(); } break;
-                        case 'd': if (e.ctrlKey || e.metaKey) { e.preventDefault(); setDarkMode(d => !d); } break;
-                    }
-                };
-                window.addEventListener('keydown', handleKeyDown);
-                return () => window.removeEventListener('keydown', handleKeyDown);
-            }, [handleNext, handlePrevious, handleFlip, handleToggleRemembered, handleUndo, undoState.show]);
-
-            const currentCard = shuffledCards[currentIndex];
-            const rememberedCountInSet = useMemo(() => {
-                let count = 0;
-                for (const r of rememberedCards) {
-                    if (totalPotentialCards.some(c => c.rank === r)) count++;
-                }
-                return count;
-            }, [totalPotentialCards, rememberedCards]);
-
-            const progress = totalPotentialCards.length > 0 ? (rememberedCountInSet / totalPotentialCards.length) * 100 : 0;
-            const isRemembered = currentCard && rememberedCards.has(currentCard.rank);
-
-            const topMastered = useMemo(() => {
-                let count = 0;
-                for (const r of rememberedCards) {
-                    const src = CITATION_DATA.sources.find(s => s.rank === r);
-                    if (src && src.tier === 'top') count++;
-                }
-                return count;
-            }, [rememberedCards]);
-
-            const stats = {
-                todayCards: streakData.todayCards,
-                totalMastered: rememberedCards.size,
-                streak: streakData.streak,
-                bestStreak: streakData.bestStreak,
-                topMastered
-            };
-
-            // Short category labels for pills
-            const categoryLabels = {
-                'Philosophical Foundations': 'Philosophy',
-                'Consciousness Science': 'Consciousness',
-                'Quantum & Physics': 'Quantum',
-                'Psychology & Toolkit': 'Psychology',
-                'Neuroscience & Meditation': 'Neuro',
-                'Ethics, Culture & Collective': 'Ethics',
-                'Historical & Narrative': 'History'
-            };
-
-            return (
-                <div className={`min-h-screen p-4 flex flex-col dark-transition ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-slate-50 to-teal-50'}`}>
-                    <div className="max-w-md mx-auto w-full flex flex-col flex-grow">
-                        {/* Header */}
-                        <header className="mb-4">
-                            <div className="flex items-center justify-between mb-1">
-                                <div className="flex items-center gap-2">
-                                    <BookIcon darkMode={darkMode} />
-                                    <h1 className={`text-xl sm:text-2xl font-bold ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>Citation Fluency</h1>
-                                </div>
-                                <button onClick={() => setDarkMode(d => !d)} className={`p-2 rounded-lg transition-colors btn-bounce ${darkMode ? 'bg-gray-800 text-yellow-400 hover:bg-gray-700' : 'bg-white text-gray-700 hover:bg-gray-100 shadow-sm border'}`} title={darkMode ? 'Light mode (Ctrl+D)' : 'Dark mode (Ctrl+D)'}>
-                                    {darkMode ? <SunIcon /> : <MoonIcon />}
-                                </button>
-                            </div>
-                            <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>The Conscious Architect &mdash; {CITATION_DATA.metadata.totalSources} sources</p>
-                        </header>
-
-                        {/* Progress and Stats Row */}
-                        <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-3">
-                                <CircularProgress progress={progress} darkMode={darkMode} />
-                                <div>
-                                    <div className={`text-sm font-medium ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-                                        {rememberedCountInSet}/{totalPotentialCards.length} mastered
-                                    </div>
-                                    <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                        {streakData.todayCards} cards today
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                {streakData.streak > 0 && (
-                                    <div className={`flex items-center gap-1 px-2 py-1 rounded-full ${darkMode ? 'bg-orange-900/30' : 'bg-orange-100'}`}>
-                                        <FireIcon />
-                                        <span className={`text-sm font-medium ${darkMode ? 'text-orange-300' : 'text-orange-700'}`}>{streakData.streak}</span>
-                                    </div>
-                                )}
-                                <button onClick={() => setShowStats(true)} className={`p-2 rounded-lg transition-colors btn-bounce ${darkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white hover:bg-gray-50 shadow-sm border'}`} title="View statistics">
-                                    <ChartIcon darkMode={darkMode} />
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Category Pills */}
-                        <div className="category-pills flex gap-2 mb-3 pb-1">
-                            <button onClick={() => setActiveCategory('all')} className={`whitespace-nowrap px-3 py-1 rounded-full text-xs font-medium transition-colors btn-bounce ${activeCategory === 'all' ? (darkMode ? 'bg-teal-800 text-teal-200' : 'bg-[#2E4057] text-white') : (darkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-100 border')}`}>
-                                All
-                            </button>
-                            {categoryNames.map(cat => (
-                                <button key={cat} onClick={() => setActiveCategory(cat)} className={`whitespace-nowrap px-3 py-1 rounded-full text-xs font-medium transition-colors btn-bounce ${activeCategory === cat ? (darkMode ? 'bg-teal-800 text-teal-200' : 'bg-[#2E4057] text-white') : (darkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-100 border')}`}>
-                                    {categoryLabels[cat] || cat}
-                                </button>
+                    {/* TIER 2: Three-Bullet Cheat Sheet (top 36 only) */}
+                    {isTop && (<div className={`space-y-1.5 mb-4 pl-1 border-l-2 ${dm?'border-teal-700':'border-[#2E4057]/30'}`}>
+                        <div className="pl-3"><span className={`text-xs font-bold uppercase ${dm?'text-teal-400':'text-[#2E4057]'}`}>Argues: </span><span className={`text-xs ${dm?'text-gray-300':'text-gray-600'}`}>{truncate(card.argues)}</span></div>
+                        <div className="pl-3"><span className={`text-xs font-bold uppercase ${dm?'text-teal-400':'text-[#2E4057]'}`}>I use it for: </span><span className={`text-xs ${dm?'text-gray-300':'text-gray-600'}`}>{truncate(card.connects)}</span></div>
+                        <div className="pl-3"><span className={`text-xs font-bold uppercase ${dm?'text-teal-400':'text-[#2E4057]'}`}>I depart: </span><span className={`text-xs ${dm?'text-gray-300':'text-gray-600'}`}>{truncate(card.departs)}</span></div>
+                    </div>)}
+                    {/* TIER 3: Show More (top 36 only) */}
+                    {isTop && (<div>
+                        <button onClick={e=>{e.stopPropagation();setShowMore(v=>!v);}} className={`flex items-center gap-1 text-xs font-medium mb-2 btn-bounce ${dm?'text-teal-400 hover:text-teal-300':'text-[#2E4057] hover:text-[#3a5270]'}`}>
+                            {showMore?'Show Less':'Show Full Study Guide'} <ChevDown open={showMore} dm={dm}/>
+                        </button>
+                        <div className={`show-more-content ${showMore?'expanded':''}`}>
+                            {[['Argues',card.argues],['Connects to Your Book',card.connects],['Where You Depart',card.departs],['Likely Objection',card.objection],['Key Details',card.keyDetails],['Suggested Reading',card.suggestedReading]].map(([label,text])=>text&&(
+                                <div key={label} className="mb-3"><div className={`text-xs font-bold uppercase tracking-wide mb-1 ${label==='Likely Objection'?(dm?'text-amber-400':'text-amber-700'):(dm?'text-teal-400':'text-[#2E4057]')}`}>{label}</div><div className={`text-xs leading-relaxed ${dm?'text-gray-300':'text-gray-700'}`}>{text}</div></div>
                             ))}
                         </div>
+                    </div>)}
+                </div>
+                <div className={`text-xs text-center py-2 flex-shrink-0 ${dm?'text-teal-500':'text-teal-600'}`}>Enter = Got It</div>
+            </div>);
 
-                        {/* Filter Row: Tier, Mode, Chapter, Shuffle */}
-                        <div className="flex flex-wrap gap-2 mb-4 items-center">
-                            <button onClick={() => setTierFilter(f => f === 'all' ? 'top' : 'all')} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors btn-bounce border ${tierFilter === 'top' ? (darkMode ? 'bg-amber-900/50 border-amber-700 text-amber-300' : 'bg-amber-100 border-amber-300 text-amber-800') : (darkMode ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-white border-gray-200 text-gray-600')}`}>
-                                {tierFilter === 'top' ? 'Top 36 Only' : 'All Tiers'}
-                            </button>
-                            <button onClick={() => setMode(m => m === 'study' ? 'quiz' : 'study')} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors btn-bounce border ${mode === 'quiz' ? (darkMode ? 'bg-purple-900/50 border-purple-700 text-purple-300' : 'bg-purple-100 border-purple-300 text-purple-800') : (darkMode ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-white border-gray-200 text-gray-600')}`}>
-                                {mode === 'quiz' ? 'Quiz Mode' : 'Study Mode'}
-                            </button>
-                            <select value={chapterFilter} onChange={(e) => setChapterFilter(e.target.value)} className={`px-2 py-1.5 rounded-lg text-xs font-medium border transition-colors ${darkMode ? 'bg-gray-800 border-gray-700 text-gray-300' : 'bg-white border-gray-200 text-gray-600'}`}>
-                                <option value="">All Chapters</option>
-                                {allChapters.map(ch => <option key={ch} value={ch}>Ch. {ch}</option>)}
-                            </select>
-                            <button onClick={handleShuffle} disabled={shuffledCards.length < 2} className={`p-1.5 rounded-lg border transition-colors disabled:opacity-50 btn-bounce ${darkMode ? 'bg-gray-800 border-gray-700 hover:bg-gray-700' : 'bg-white border-gray-200 hover:bg-gray-50'}`} title="Shuffle">
-                                <ShuffleIcon darkMode={darkMode} />
-                            </button>
-                            <div className={`ml-auto text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                {shuffledCards.length > 0 ? `${currentIndex + 1} / ${shuffledCards.length}` : 'Empty'}
-                            </div>
-                        </div>
+            return (<div className={`absolute inset-0 w-full h-full transition-transform duration-500 transform-style-preserve-3d card-flip-container ${isFlipped?'rotate-y-180':''}`}>{front}{back}</div>);
+        };
 
-                        {/* Flashcard */}
-                        <div className="relative w-full min-h-[380px] cursor-pointer perspective-1000 touch-action-pan-y"
-                            onPointerDown={handlePointerDown}
-                            onPointerMove={handlePointerMove}
-                            onPointerUp={handlePointerUp}
-                            onClick={handleCardClick}
-                        >
-                            <Flashcard card={currentCard} isFlipped={isFlipped} mode={mode} darkMode={darkMode} />
-                        </div>
+        // ===== CONNECTION CARD =====
+        const ConnectionCard = ({card, isFlipped, dm}) => {
+            if (!card || !card.sources) return (<div className={`absolute inset-0 w-full h-full min-h-[400px] rounded-xl card-shadow border-2 flex flex-col items-center justify-center p-4 text-center ${dm?'bg-gray-800 border-gray-700':'bg-white border-gray-200'}`}><div className={`text-lg font-medium ${dm?'text-gray-300':'text-gray-600'}`}>All connections mastered!</div></div>);
+            const front = (<div className={`absolute inset-0 w-full h-full rounded-xl card-shadow border-2 backface-hidden flex flex-col items-center justify-center p-6 ${dm?'bg-gray-800 border-purple-800':'bg-white border-purple-200'}`}>
+                <span className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-medium ${dm?'bg-purple-900/50 text-purple-300':'bg-purple-100 text-purple-700'}`}>Connection</span>
+                <div className={`text-xs uppercase tracking-wide mb-3 ${dm?'text-purple-400':'text-purple-600'}`}>Argument Thread</div>
+                <div className={`font-bold text-center text-xl sm:text-2xl mb-4 ${dm?'text-gray-100':'text-gray-800'}`}>{card.thread}</div>
+                <div className="flex flex-wrap gap-2 justify-center mb-4">{(card.sources||[]).map(s=><span key={s} className={`px-3 py-1 rounded-full text-sm font-medium ${dm?'bg-purple-900/40 text-purple-200':'bg-purple-100 text-purple-800'}`}>{s}</span>)}</div>
+                <div className={`text-xs ${dm?'text-gray-500':'text-gray-400'}`}>How do these connect? Flip to check.</div>
+            </div>);
+            const back = (<div className={`absolute inset-0 w-full h-full rounded-xl card-shadow border-2 backface-hidden rotate-y-180 flex flex-col p-5 ${dm?'bg-purple-900/20 border-purple-800':'bg-purple-50 border-purple-200'}`}>
+                <div className="card-back-content flex-1"><div className={`text-xs font-bold uppercase tracking-wide mb-2 ${dm?'text-purple-400':'text-purple-700'}`}>{card.thread}</div><div className={`text-sm leading-relaxed ${dm?'text-gray-200':'text-gray-700'}`}>{card.connection}</div></div>
+                <div className={`text-xs text-center py-2 flex-shrink-0 ${dm?'text-purple-400':'text-purple-600'}`}>Enter = Got It</div>
+            </div>);
+            return (<div className={`absolute inset-0 w-full h-full transition-transform duration-500 transform-style-preserve-3d card-flip-container ${isFlipped?'rotate-y-180':''}`}>{front}{back}</div>);
+        };
 
-                        {/* Deck Controls */}
-                        <DeckControls
-                            handlers={{ handlePrevious, resetDeckProgress, handleToggleRemembered, handleNext }}
-                            state={{ deckSize: shuffledCards.length, totalPotentialCards: totalPotentialCards.length, isCardPresent: !!currentCard, isRemembered, isAnimating }}
-                            darkMode={darkMode}
-                        />
+        // ===== MAIN APP =====
+        const App = () => {
+            const [idx, setIdx] = useState(0);
+            const [flipped, setFlipped] = useState(false);
+            const [mode, setMode] = useState(()=>{try{return JSON.parse(localStorage.getItem('cfMode'))||'study';}catch{return 'study';}});
+            const [category, setCategory] = useState(()=>{try{return JSON.parse(localStorage.getItem('cfCat'))||'all';}catch{return 'all';}});
+            const [tierFilter, setTierFilter] = useState(()=>{try{return JSON.parse(localStorage.getItem('cfTier'))||'all';}catch{return 'all';}});
+            const [chFilter, setChFilter] = useState(()=>{try{return JSON.parse(localStorage.getItem('cfCh'))||'';}catch{return '';}});
+            const [cards, setCards] = useState([]);
+            const [anim, setAnim] = useState(false);
+            const FLIP_DUR = 500;
+            const [dm, setDm] = useState(()=>{try{const s=localStorage.getItem('cfDark');return s?JSON.parse(s):window.matchMedia('(prefers-color-scheme: dark)').matches;}catch{return false;}});
+            const [showStats, setShowStats] = useState(false);
+            const [undo, setUndo] = useState({show:false,card:null,timeout:null});
+            const [streak, setStreak] = useState(()=>{
+                try{const d=JSON.parse(localStorage.getItem('cfStreak'));if(d){const t=getTodayStr(),y=new Date(Date.now()-86400000).toISOString().split('T')[0];if(d.lastDate===t)return d;if(d.lastDate===y)return{...d,todayCards:0};return{streak:0,bestStreak:d.bestStreak||0,lastDate:null,todayCards:0};}return{streak:0,bestStreak:0,lastDate:null,todayCards:0};}catch{return{streak:0,bestStreak:0,lastDate:null,todayCards:0};}
+            });
+            const [mastered, setMastered] = useState(()=>{try{return new Set(JSON.parse(localStorage.getItem('cfMastered'))||[]);}catch{return new Set();}});
+            const [connMastered, setConnMastered] = useState(()=>{try{return new Set(JSON.parse(localStorage.getItem('cfConnMast'))||[]);}catch{return new Set();}});
+            const intRef = useRef({});
+            const ptrRef = useRef(false);
 
-                        {/* Keyboard hints */}
-                        <div className={`text-center text-xs mb-4 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded ${darkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
-                                &larr; &rarr; Navigate &middot; Space Flip &middot; Enter Got It
-                            </span>
-                        </div>
+            useEffect(()=>{try{localStorage.setItem('cfDark',JSON.stringify(dm));}catch{}},[dm]);
+            useEffect(()=>{try{localStorage.setItem('cfMode',JSON.stringify(mode));}catch{}},[mode]);
+            useEffect(()=>{try{localStorage.setItem('cfCat',JSON.stringify(category));}catch{}},[category]);
+            useEffect(()=>{try{localStorage.setItem('cfTier',JSON.stringify(tierFilter));}catch{}},[tierFilter]);
+            useEffect(()=>{try{localStorage.setItem('cfCh',JSON.stringify(chFilter));}catch{}},[chFilter]);
+            useEffect(()=>{try{localStorage.setItem('cfStreak',JSON.stringify(streak));}catch{}},[streak]);
+            useEffect(()=>{const t=setTimeout(()=>{try{localStorage.setItem('cfMastered',JSON.stringify([...mastered]));}catch{}},500);return()=>clearTimeout(t);},[mastered]);
+            useEffect(()=>{const t=setTimeout(()=>{try{localStorage.setItem('cfConnMast',JSON.stringify([...connMastered]));}catch{}},500);return()=>clearTimeout(t);},[connMastered]);
+
+            const catNames = Object.keys(DATA.categories);
+            const catLabels = {'Philosophical Foundations':'Philosophy','Consciousness Science':'Consciousness','Quantum & Physics':'Quantum','Psychology & Toolkit':'Psychology','Neuroscience & Meditation':'Neuro','Ethics, Culture & Collective':'Ethics','Historical & Narrative':'History'};
+            const allChapters = useMemo(()=>{const s=new Set();DATA.sources.forEach(src=>src.chapters.split(',').map(c=>c.trim()).forEach(c=>{if(c)s.add(c);}));return[...s].sort((a,b)=>parseInt(a)-parseInt(b));},[]);
+
+            const filtered = useMemo(()=>{
+                if(mode==='connections') return [];
+                let srcs=DATA.sources;
+                if(category!=='all'){const ranks=new Set(DATA.categories[category]||[]);srcs=srcs.filter(s=>ranks.has(s.rank));}
+                if(tierFilter==='top') srcs=srcs.filter(s=>s.tier==='top');
+                if(chFilter) srcs=srcs.filter(s=>s.chapters.split(',').map(c=>c.trim()).includes(chFilter));
+                return srcs.sort((a,b)=>a.rank-b.rank);
+            },[category,tierFilter,chFilter,mode]);
+
+            useEffect(()=>{
+                if(mode==='connections'){setCards(DATA.connectionCards.filter(c=>!connMastered.has(c.id)));}
+                else{setCards(filtered.filter(s=>!mastered.has(s.rank)));}
+                setIdx(0);setFlipped(false);
+            },[filtered,mode]);
+
+            const doShuffle=()=>{setCards(p=>shuffleArr([...p]));setIdx(0);setFlipped(false);};
+            const nav=useCallback((dir)=>{if(anim||cards.length===0)return;const go=()=>setIdx(i=>dir==='next'?(i+1)%cards.length:(i-1+cards.length)%cards.length);if(flipped){setAnim(true);setFlipped(false);setTimeout(()=>{go();setAnim(false);},FLIP_DUR);}else go();},[flipped,anim,cards.length]);
+            const flip=useCallback(()=>{if(cards.length>0)setFlipped(f=>!f);},[cards.length]);
+
+            const handleUndo=useCallback(()=>{
+                if(!undo.card)return;if(undo.timeout)clearTimeout(undo.timeout);setUndo({show:false,card:null,timeout:null});
+                if(mode==='connections'){setConnMastered(p=>{const n=new Set(p);n.delete(undo.card.id);return n;});setCards(p=>[...p,undo.card]);}
+                else{setMastered(p=>{const n=new Set(p);n.delete(undo.card.rank);return n;});setCards(p=>[...p,undo.card]);}
+                setStreak(p=>({...p,todayCards:Math.max(0,p.todayCards-1)}));
+            },[undo,mode]);
+
+            const gotIt=useCallback(()=>{
+                const cur=cards[idx];if(!cur||anim)return;
+                const id=mode==='connections'?cur.id:cur.rank;const mSet=mode==='connections'?connMastered:mastered;const already=mSet.has(id);
+                const doUpdate=()=>{
+                    if(mode==='connections'){setConnMastered(p=>{const n=new Set(p);if(already)n.delete(id);else n.add(id);return n;});}
+                    else{setMastered(p=>{const n=new Set(p);if(already)n.delete(id);else n.add(id);return n;});}
+                    if(!already){
+                        setStreak(p=>{const t=getTodayStr(),tc=p.todayCards+1;let ns=p.streak;if(p.lastDate!==t)ns=p.streak+1;return{streak:ns,bestStreak:Math.max(p.bestStreak,ns),lastDate:t,todayCards:tc};});
+                        setCards(p=>{const nc=p.filter(c=>(mode==='connections'?c.id:c.rank)!==id);setIdx(pi=>Math.min(pi,nc.length>0?nc.length-1:0));return nc;});
+                        if(undo.timeout)clearTimeout(undo.timeout);const to=setTimeout(()=>setUndo({show:false,card:null,timeout:null}),5000);setUndo({show:true,card:cur,timeout:to});
+                    }
+                };
+                if(flipped&&!already){setAnim(true);setFlipped(false);setTimeout(()=>{doUpdate();setAnim(false);},FLIP_DUR);}else{setFlipped(false);doUpdate();}
+            },[cards,idx,anim,mode,mastered,connMastered,flipped,undo]);
+
+            const resetDeck=()=>{
+                if(mode==='connections'){setConnMastered(new Set());setCards([...DATA.connectionCards]);}
+                else{const ranks=filtered.map(s=>s.rank);setMastered(p=>{const n=new Set(p);ranks.forEach(r=>n.delete(r));return n;});setCards([...filtered]);}
+                setIdx(0);setFlipped(false);
+            };
+
+            const pDown=(e)=>{if(cards.length===0||anim)return;ptrRef.current=true;intRef.current={startX:e.clientX,startY:e.clientY,isSwiping:false};try{e.target.setPointerCapture(e.pointerId);}catch{}};
+            const pMove=(e)=>{if(!intRef.current.startX)return;if(Math.abs(e.clientX-intRef.current.startX)>10||Math.abs(e.clientY-intRef.current.startY)>10)intRef.current.isSwiping=true;};
+            const pUp=(e)=>{if(!intRef.current.startX)return;const d=e.clientX-intRef.current.startX;if(intRef.current.isSwiping&&Math.abs(d)>50){d<0?nav('next'):nav('previous');}else{flip();}try{e.target.releasePointerCapture(e.pointerId);}catch{}intRef.current={};};
+            const cardClick=()=>{if(ptrRef.current)return;if(cards.length===0||anim)return;flip();};
+
+            useEffect(()=>{
+                const h=(e)=>{if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;switch(e.key){case'ArrowLeft':e.preventDefault();nav('previous');break;case'ArrowRight':e.preventDefault();nav('next');break;case' ':e.preventDefault();flip();break;case'Enter':e.preventDefault();gotIt();break;case'z':if((e.ctrlKey||e.metaKey)&&undo.show){e.preventDefault();handleUndo();}break;case'd':if(e.ctrlKey||e.metaKey){e.preventDefault();setDm(d=>!d);}break;}};
+                window.addEventListener('keydown',h);return()=>window.removeEventListener('keydown',h);
+            },[nav,flip,gotIt,handleUndo,undo.show]);
+
+            const cur=cards[idx];const total=mode==='connections'?DATA.connectionCards:filtered;
+            const masteredInView=useMemo(()=>{if(mode==='connections'){let c=0;for(const id of connMastered)if(DATA.connectionCards.some(cc=>cc.id===id))c++;return c;}let c=0;for(const r of mastered)if(total.some(s=>s.rank===r))c++;return c;},[total,mastered,connMastered,mode]);
+            const progress=total.length>0?(masteredInView/total.length)*100:0;
+            const stats={todayCards:streak.todayCards,totalMastered:mastered.size,connMastered:connMastered.size,streak:streak.streak,bestStreak:streak.bestStreak};
+
+            return (
+                <div className={`min-h-screen p-4 flex flex-col dark-transition ${dm?'bg-gray-900':'bg-gradient-to-br from-slate-50 to-teal-50'}`}>
+                    <div className="max-w-md mx-auto w-full flex flex-col flex-grow">
+                        <header className="mb-3">
+                            <div className="flex items-center justify-between mb-1"><div className="flex items-center gap-2"><BookIcon dm={dm}/><h1 className={`text-xl sm:text-2xl font-bold ${dm?'text-gray-100':'text-gray-800'}`}>Citation Fluency</h1></div><button onClick={()=>setDm(d=>!d)} className={`p-2 rounded-lg transition-colors btn-bounce ${dm?'bg-gray-800 text-yellow-400 hover:bg-gray-700':'bg-white text-gray-700 hover:bg-gray-100 shadow-sm border'}`}>{dm?<SunIcon/>:<MoonIcon/>}</button></div>
+                            <p className={`text-xs ${dm?'text-gray-500':'text-gray-400'}`}>The Conscious Architect — {DATA.metadata.totalSources} sources · {DATA.connectionCards.length} connections</p>
+                        </header>
+                        <div className="flex items-center justify-between mb-3"><div className="flex items-center gap-3"><CircularProgress progress={progress} dm={dm}/><div><div className={`text-sm font-medium ${dm?'text-gray-200':'text-gray-700'}`}>{masteredInView}/{total.length} mastered</div><div className={`text-xs ${dm?'text-gray-400':'text-gray-500'}`}>{streak.todayCards} today</div></div></div><div className="flex items-center gap-2">{streak.streak>0&&<div className={`flex items-center gap-1 px-2 py-1 rounded-full ${dm?'bg-orange-900/30':'bg-orange-100'}`}><FireIcon/><span className={`text-sm font-medium ${dm?'text-orange-300':'text-orange-700'}`}>{streak.streak}</span></div>}<button onClick={()=>setShowStats(true)} className={`p-2 rounded-lg transition-colors btn-bounce ${dm?'bg-gray-800 hover:bg-gray-700':'bg-white hover:bg-gray-50 shadow-sm border'}`}><ChartIcon dm={dm}/></button></div></div>
+                        <div className="flex gap-1 mb-3">{[{k:'study',l:'Study'},{k:'connections',l:'Connections'},{k:'quiz',l:'Quiz'}].map(m=><button key={m.k} onClick={()=>setMode(m.k)} className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors btn-bounce ${mode===m.k?(m.k==='connections'?(dm?'bg-purple-800 text-purple-200':'bg-purple-600 text-white'):(dm?'bg-teal-800 text-teal-200':'bg-[#2E4057] text-white')):(dm?'bg-gray-800 text-gray-400 hover:bg-gray-700':'bg-white text-gray-600 hover:bg-gray-100 border')}`}>{m.l}</button>)}</div>
+                        {mode!=='connections'&&(<><div className="category-pills flex gap-2 mb-3 pb-1"><button onClick={()=>setCategory('all')} className={`whitespace-nowrap px-3 py-1 rounded-full text-xs font-medium transition-colors btn-bounce ${category==='all'?(dm?'bg-teal-800 text-teal-200':'bg-[#2E4057] text-white'):(dm?'bg-gray-800 text-gray-400 hover:bg-gray-700':'bg-white text-gray-600 hover:bg-gray-100 border')}`}>All</button>{catNames.map(c=><button key={c} onClick={()=>setCategory(c)} className={`whitespace-nowrap px-3 py-1 rounded-full text-xs font-medium transition-colors btn-bounce ${category===c?(dm?'bg-teal-800 text-teal-200':'bg-[#2E4057] text-white'):(dm?'bg-gray-800 text-gray-400 hover:bg-gray-700':'bg-white text-gray-600 hover:bg-gray-100 border')}`}>{catLabels[c]||c}</button>)}</div>
+                        <div className="flex flex-wrap gap-2 mb-3 items-center"><button onClick={()=>setTierFilter(f=>f==='all'?'top':'all')} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors btn-bounce border ${tierFilter==='top'?(dm?'bg-amber-900/50 border-amber-700 text-amber-300':'bg-amber-100 border-amber-300 text-amber-800'):(dm?'bg-gray-800 border-gray-700 text-gray-400':'bg-white border-gray-200 text-gray-600')}`}>{tierFilter==='top'?'Top 36 Only':'All Tiers'}</button><select value={chFilter} onChange={e=>setChFilter(e.target.value)} className={`px-2 py-1.5 rounded-lg text-xs font-medium border ${dm?'bg-gray-800 border-gray-700 text-gray-300':'bg-white border-gray-200 text-gray-600'}`}><option value="">All Chapters</option>{allChapters.map(ch=><option key={ch} value={ch}>Ch. {ch}</option>)}</select><button onClick={doShuffle} disabled={cards.length<2} className={`p-1.5 rounded-lg border transition-colors disabled:opacity-50 btn-bounce ${dm?'bg-gray-800 border-gray-700 hover:bg-gray-700':'bg-white border-gray-200 hover:bg-gray-50'}`}><ShuffleIcon dm={dm}/></button><div className={`ml-auto text-xs font-medium ${dm?'text-gray-400':'text-gray-500'}`}>{cards.length>0?`${idx+1} / ${cards.length}`:'Empty'}</div></div></>)}
+                        {mode==='connections'&&(<div className="flex justify-between items-center mb-3"><button onClick={doShuffle} disabled={cards.length<2} className={`p-1.5 rounded-lg border transition-colors disabled:opacity-50 btn-bounce ${dm?'bg-gray-800 border-gray-700 hover:bg-gray-700':'bg-white border-gray-200 hover:bg-gray-50'}`}><ShuffleIcon dm={dm}/></button><div className={`text-xs font-medium ${dm?'text-gray-400':'text-gray-500'}`}>{cards.length>0?`${idx+1} / ${cards.length}`:'Empty'}</div></div>)}
+                        <div className="relative w-full min-h-[400px] cursor-pointer perspective-1000 touch-action-pan-y" onPointerDown={pDown} onPointerMove={pMove} onPointerUp={pUp} onClick={cardClick}>{mode==='connections'?<ConnectionCard card={cur} isFlipped={flipped} dm={dm}/>:<SourceCard card={cur} isFlipped={flipped} mode={mode} dm={dm}/>}</div>
+                        <div className="flex justify-between items-center mb-4 mt-4"><button onClick={()=>nav('previous')} disabled={cards.length<2||anim} className={`flex items-center gap-2 px-4 py-2 rounded-lg shadow-sm border disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm btn-bounce ${dm?'bg-gray-800 border-gray-700 text-gray-200 hover:bg-gray-700':'bg-white hover:bg-gray-50'}`}><ChevLeft/>Prev</button><div className="flex items-center gap-2"><button onClick={resetDeck} disabled={total.length===0} className={`p-2 rounded-lg shadow-sm border transition-colors disabled:opacity-50 btn-bounce ${dm?'bg-gray-800 border-gray-700 hover:bg-gray-700':'bg-white hover:bg-gray-50'}`} title="Reset"><RefreshIcon dm={dm}/></button><button onClick={gotIt} disabled={!cur||anim} className={`p-2 rounded-lg shadow-sm border transition-colors disabled:opacity-50 btn-bounce ${(cur&&(mode==='connections'?connMastered.has(cur.id):mastered.has(cur.rank)))?'bg-green-500 text-white border-green-600 hover:bg-green-600':dm?'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700':'bg-white text-gray-600 hover:bg-gray-50'}`} title="Got It (Enter)"><CheckIcon/></button></div><button onClick={()=>nav('next')} disabled={cards.length<2||anim} className="flex items-center gap-2 px-4 py-2 bg-[#2E4057] text-white rounded-lg shadow-sm disabled:opacity-50 hover:bg-[#3a5270] transition-colors text-sm btn-bounce">Next<ChevRight/></button></div>
+                        <div className={`text-center text-xs mb-4 ${dm?'text-gray-500':'text-gray-400'}`}><span className={`inline-flex items-center gap-1 px-2 py-1 rounded ${dm?'bg-gray-800':'bg-gray-100'}`}>&larr; &rarr; Navigate &middot; Space Flip &middot; Enter Got It</span></div>
                     </div>
-
-                    {/* Undo Toast */}
-                    <UndoToast show={undoState.show} onUndo={handleUndo} onDismiss={() => setUndoState({ show: false, card: null, timeout: null })} darkMode={darkMode} cardName={undoState.card?.author || ''} />
-
-                    {/* Stats Modal */}
-                    <StatsModal show={showStats} onClose={() => setShowStats(false)} stats={stats} darkMode={darkMode} />
+                    <UndoToast show={undo.show} onUndo={handleUndo} dm={dm}/>
+                    <StatsModal show={showStats} onClose={()=>setShowStats(false)} stats={stats} dm={dm}/>
                 </div>
             );
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<CitationFlashcards />);
+        root.render(<App/>);
     </script>
 </body>
 </html>
