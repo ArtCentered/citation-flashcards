@@ -7,6 +7,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Citation Fluency">
     <title>Citation Fluency Builder — The Conscious Architect</title>
+    <link rel="apple-touch-icon" href="icon-180.png">
+    <link rel="icon" type="image/png" href="icon-180.png">
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -2630,6 +2632,28 @@
             return a;
         };
 
+        // --- Error Boundary (prevents white screen on iOS standalone) ---
+        class ErrorBoundary extends React.Component {
+            constructor(props) { super(props); this.state = { hasError: false }; }
+            static getDerivedStateFromError() { return { hasError: true }; }
+            componentDidCatch(err) { console.error('ErrorBoundary caught:', err); }
+            render() {
+                if (this.state.hasError) {
+                    return React.createElement('div', {
+                        style: { padding: '2rem', textAlign: 'center', fontFamily: 'system-ui' }
+                    },
+                        React.createElement('h2', null, 'Something went wrong'),
+                        React.createElement('p', { style: { color: '#666', margin: '1rem 0' } }, 'Tap below to reload.'),
+                        React.createElement('button', {
+                            onClick: () => { localStorage.removeItem('cfMode'); location.reload(); },
+                            style: { padding: '12px 24px', background: '#2E4057', color: 'white', border: 'none', borderRadius: '8px', fontSize: '16px' }
+                        }, 'Reload App')
+                    );
+                }
+                return this.props.children;
+            }
+        }
+
         // --- Icons ---
         const BookIcon = ({dm}) => <svg className={`w-6 h-6 ${dm?'text-teal-400':'text-[#2E4057]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>;
         const ChevLeft = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>;
@@ -2845,7 +2869,7 @@
                         {mode!=='connections'&&(<><div className="category-pills flex gap-2 mb-3 pb-1"><button onClick={()=>setCategory('all')} className={`whitespace-nowrap px-3 py-1 rounded-full text-xs font-medium transition-colors btn-bounce ${category==='all'?(dm?'bg-teal-800 text-teal-200':'bg-[#2E4057] text-white'):(dm?'bg-gray-800 text-gray-400 hover:bg-gray-700':'bg-white text-gray-600 hover:bg-gray-100 border')}`}>All</button>{catNames.map(c=><button key={c} onClick={()=>setCategory(c)} className={`whitespace-nowrap px-3 py-1 rounded-full text-xs font-medium transition-colors btn-bounce ${category===c?(dm?'bg-teal-800 text-teal-200':'bg-[#2E4057] text-white'):(dm?'bg-gray-800 text-gray-400 hover:bg-gray-700':'bg-white text-gray-600 hover:bg-gray-100 border')}`}>{catLabels[c]||c}</button>)}</div>
                         <div className="flex flex-wrap gap-2 mb-3 items-center"><button onClick={()=>setTierFilter(f=>f==='all'?'top':'all')} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors btn-bounce border ${tierFilter==='top'?(dm?'bg-amber-900/50 border-amber-700 text-amber-300':'bg-amber-100 border-amber-300 text-amber-800'):(dm?'bg-gray-800 border-gray-700 text-gray-400':'bg-white border-gray-200 text-gray-600')}`}>{tierFilter==='top'?'Top 36 Only':'All Tiers'}</button><select value={chFilter} onChange={e=>setChFilter(e.target.value)} className={`px-2 py-1.5 rounded-lg text-xs font-medium border ${dm?'bg-gray-800 border-gray-700 text-gray-300':'bg-white border-gray-200 text-gray-600'}`}><option value="">All Chapters</option>{allChapters.map(ch=><option key={ch} value={ch}>Ch. {ch}</option>)}</select><button onClick={doShuffle} disabled={cards.length<2} className={`p-1.5 rounded-lg border transition-colors disabled:opacity-50 btn-bounce ${dm?'bg-gray-800 border-gray-700 hover:bg-gray-700':'bg-white border-gray-200 hover:bg-gray-50'}`}><ShuffleIcon dm={dm}/></button><div className={`ml-auto text-xs font-medium ${dm?'text-gray-400':'text-gray-500'}`}>{cards.length>0?`${idx+1} / ${cards.length}`:'Empty'}</div></div></>)}
                         {mode==='connections'&&(<div className="flex justify-between items-center mb-3"><button onClick={doShuffle} disabled={cards.length<2} className={`p-1.5 rounded-lg border transition-colors disabled:opacity-50 btn-bounce ${dm?'bg-gray-800 border-gray-700 hover:bg-gray-700':'bg-white border-gray-200 hover:bg-gray-50'}`}><ShuffleIcon dm={dm}/></button><div className={`text-xs font-medium ${dm?'text-gray-400':'text-gray-500'}`}>{cards.length>0?`${idx+1} / ${cards.length}`:'Empty'}</div></div>)}
-                        <div className="relative w-full min-h-[400px] cursor-pointer perspective-1000 touch-action-pan-y" onPointerDown={pDown} onPointerMove={pMove} onPointerUp={pUp} onClick={cardClick}>{mode==='connections'?<ConnectionCard card={cur} isFlipped={flipped} dm={dm}/>:<SourceCard card={cur} isFlipped={flipped} mode={mode} dm={dm}/>}</div>
+                        <div className="relative w-full min-h-[400px] cursor-pointer perspective-1000 touch-action-pan-y" onPointerDown={pDown} onPointerMove={pMove} onPointerUp={pUp} onClick={cardClick}>{mode==='connections'?<ConnectionCard card={cur && cur.sources ? cur : null} isFlipped={flipped} dm={dm}/>:<SourceCard card={cur && cur.rank ? cur : null} isFlipped={flipped} mode={mode} dm={dm}/>}</div>
                         <div className="flex justify-between items-center mb-4 mt-4"><button onClick={()=>nav('previous')} disabled={cards.length<2||anim} className={`flex items-center gap-2 px-4 py-2 rounded-lg shadow-sm border disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm btn-bounce ${dm?'bg-gray-800 border-gray-700 text-gray-200 hover:bg-gray-700':'bg-white hover:bg-gray-50'}`}><ChevLeft/>Prev</button><div className="flex items-center gap-2"><button onClick={resetDeck} disabled={total.length===0} className={`p-2 rounded-lg shadow-sm border transition-colors disabled:opacity-50 btn-bounce ${dm?'bg-gray-800 border-gray-700 hover:bg-gray-700':'bg-white hover:bg-gray-50'}`} title="Reset"><RefreshIcon dm={dm}/></button><button onClick={gotIt} disabled={!cur||anim} className={`p-2 rounded-lg shadow-sm border transition-colors disabled:opacity-50 btn-bounce ${(cur&&(mode==='connections'?connMastered.has(cur.id):mastered.has(cur.rank)))?'bg-green-500 text-white border-green-600 hover:bg-green-600':dm?'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700':'bg-white text-gray-600 hover:bg-gray-50'}`} title="Got It (Enter)"><CheckIcon/></button></div><button onClick={()=>nav('next')} disabled={cards.length<2||anim} className="flex items-center gap-2 px-4 py-2 bg-[#2E4057] text-white rounded-lg shadow-sm disabled:opacity-50 hover:bg-[#3a5270] transition-colors text-sm btn-bounce">Next<ChevRight/></button></div>
                         <div className={`text-center text-xs mb-4 ${dm?'text-gray-500':'text-gray-400'}`}><span className={`inline-flex items-center gap-1 px-2 py-1 rounded ${dm?'bg-gray-800':'bg-gray-100'}`}>&larr; &rarr; Navigate &middot; Space Flip &middot; Enter Got It</span></div>
                     </div>
@@ -2856,7 +2880,7 @@
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App/>);
+        root.render(<ErrorBoundary><App/></ErrorBoundary>);
     </script>
 </body>
 </html>
